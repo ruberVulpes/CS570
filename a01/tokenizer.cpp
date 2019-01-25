@@ -14,7 +14,7 @@ void printLinkedList(list <string> tokens){
     for(list<string> :: iterator it = tokens.begin(); it != tokens.end(); it++){
         cout << "{" << *it << "}";
         // Prevents extra comma separator for last element
-        if(next(it, 1) != tokens.end()){
+        if(it != --tokens.end()){
             cout << ",";
         }
     }
