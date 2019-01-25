@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <readline/readline.h>
 #include <string>
+#include <sstream>
 #include <list>
 #include <iterator>
 #include <iostream>
@@ -25,8 +26,12 @@ void printLinkedList(list <string> tokens){
 int main() {
     string userInput = readline(">");
     list <string> tokens;
-        for(int i = 0; i < userInput.length(); i++){
-            tokens.push_back(string(1,userInput[i]));
+    ostringstream os;
+    for(int i = 0; i < userInput.length(); i++){
+        os << userInput[i];
+        tokens.push_back(os.str());
+        os.str("");
+
     }
     printLinkedList(tokens);
     return 0;
