@@ -5,20 +5,16 @@
 #include <readline/readline.h>
 #include <string>
 #include <list>
+#include <iterator>
 #include <iostream>
 using namespace std;
 
-struct node {
-    string token;
-    node *next;
-};
-
-void printLinkedList(list ){
+void printLinkedList(list <string> tokens){
     cout << "[";
-    while(head){
-        cout << "{" << head->token << "}";
-        head = head->next;
-        if(head){
+    for(list<string> :: iterator it = tokens.begin(); it != tokens.end(); it++){
+        cout << "{" << *it << "}";
+        // Prevents extra comma separator for last element
+        if(next(it, 1) != tokens.end()){
             cout << ",";
         }
     }
@@ -28,15 +24,10 @@ void printLinkedList(list ){
 
 int main() {
     string userInput = readline(">");
-    node *head = new node;
-    node *tail = head;
-    head->token = userInput[0];
-    for(int i = 1; i < userInput.length(); i++){
-//        tail->next = new node;
-//        tail->next->token = userInput[i];
-//        tail = tail->next;
+    list <string> tokens;
+        for(int i = 0; i < userInput.length(); i++){
+            tokens.push_back(string(1,userInput[i]));
     }
-//    cout << head->next->token << endl;
-//    printLinkedList(head->next);
+    printLinkedList(tokens);
     return 0;
 }
