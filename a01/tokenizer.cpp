@@ -12,24 +12,27 @@
 using namespace std;
 
 void printLinkedList(list <string> tokens);
+list <string> readInput();
 bool isNewToken(char c);
 bool isSpecialCharacter(char c);
 bool isEscapeCharacter(char c);
 
 int main() {
+    list<string> tokens = readInput();
+    printLinkedList(tokens);
+    return 0;
+}
+
+list <string> readInput(){
     string userInput = readline(">");
     list <string> tokens;
     ostringstream os;
     for(int i = 0; i < userInput.length(); i++){
-        if(isEscapeCharacter(userInput[i])){
-            continue;
-        }
         os << userInput[i];
         tokens.push_back(os.str());
         os.str("");
     }
-    printLinkedList(tokens);
-    return 0;
+    return tokens;
 }
 
 void printLinkedList(list <string> tokens){
