@@ -16,6 +16,7 @@ list <string> readInput();
 bool isNewToken(char c);
 bool isSpecialCharacter(char c);
 bool isEscapeCharacter(char c);
+bool isSpace(char c);
 
 int main() {
     list<string> tokens = readInput();
@@ -28,9 +29,27 @@ list <string> readInput(){
     list <string> tokens;
     ostringstream os;
     for(int i = 0; i < userInput.length(); i++){
-        os << userInput[i];
+        if(isEscapeCharacter(userInput[i])){
+            os << userInput[++i];
+        } else if (isSpecialCharacter(userInput[i])){
+            if(os.str() != ""){
+                tokens.push_back(os.str());
+                os.str("");
+            }
+            os << userInput[i];
+            tokens.push_back(os.str());
+            os.str("");
+        } else if(isSpace(userInput[i])){
+            if(os.str() != ""){
+                tokens.push_back(os.str());
+                os.str("");
+            }
+        } else {
+            os << userInput[i];
+        }
+    }
+    if(os.str() != ""){
         tokens.push_back(os.str());
-        os.str("");
     }
     return tokens;
 }
@@ -60,4 +79,8 @@ bool isSpecialCharacter(char c){
 
 bool isEscapeCharacter(char c){
     return c == '\\';
+}
+
+bool isSpace(char c){
+    return isspace(c) != 0;
 }
