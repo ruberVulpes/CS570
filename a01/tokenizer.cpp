@@ -50,8 +50,7 @@ list <string> readInput(){
         }
     }
     //Insert last token
-    addToken(token);
-    }
+    addToken(tokens, token);
     return tokens;
 }
 
