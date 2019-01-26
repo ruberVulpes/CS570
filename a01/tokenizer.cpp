@@ -25,11 +25,13 @@ bool isSpace(char c);
 
 bool isQuote(char c);
 
-//adds non empty Token to end of List
+//adds non empty Token to end of the passed List
 void addToken(list <string> &tokens, ostringstream &token);
 
+//clears current ostringstream (ie the token)
 void clearToken(ostringstream &token);
 
+//A helper function to set the corresponding flag for a quote
 void setQuoteFlags(char c, bool &isSingleQuote, bool &isDoubleQuote);
 
 int main() {
@@ -39,22 +41,29 @@ int main() {
 }
 
 list <string> readInput() {
-    string userInput = readline(">");
-    list <string> tokens;
-    ostringstream token;
     bool insideDoubleQuotes = false;
     bool insideSingleQuotes = false;
+    list <string> tokens;
+    ostringstream token;
+
+    string userInput = readline(">");
 
     for (string::iterator iter = userInput.begin(); iter != userInput.end(); iter++) {
         if (isEscapeCharacter(*iter) && !insideSingleQuotes) {
-            token << *(++iter);
+            //Prevents running out of bounds
+            if(iter != --userInput.end()) {
+                token << *(++iter);
+            }
         } else if (isQuote(*iter)) {
+            //Start of a new quote section
             if (!insideSingleQuotes && !insideDoubleQuotes) {
                 setQuoteFlags(*iter, insideSingleQuotes, insideDoubleQuotes);
+                //Ending a double quote section
             } else if (*iter == '\"' && insideDoubleQuotes) {
                 addToken(tokens, token);
                 clearToken(token);
                 insideDoubleQuotes = false;
+                //Ending a single quote section
             } else if (*iter == '\'' && insideSingleQuotes) {
                 addToken(tokens, token);
                 clearToken(token);
