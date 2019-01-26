@@ -6,7 +6,6 @@
 #include <string>
 #include <sstream>
 #include <list>
-#include <vector>
 #include <iterator>
 #include <iostream>
 using namespace std;
@@ -18,6 +17,10 @@ bool isSpecialCharacter(char c);
 bool isEscapeCharacter(char c);
 bool isSpace(char c);
 
+//adds non empty Token to end of List
+void addToken(list<string> &tokens, ostringstream &token);
+void clearToken(ostringstream &token);
+
 int main() {
     list<string> tokens = readInput();
     printLinkedList(tokens);
@@ -27,29 +30,27 @@ int main() {
 list <string> readInput(){
     string userInput = readline(">");
     list <string> tokens;
-    ostringstream os;
-    for(int i = 0; i < userInput.length(); i++){
-        if(isEscapeCharacter(userInput[i])){
-            os << userInput[++i];
-        } else if (isSpecialCharacter(userInput[i])){
-            if(os.str() != ""){
-                tokens.push_back(os.str());
-                os.str("");
-            }
-            os << userInput[i];
-            tokens.push_back(os.str());
-            os.str("");
-        } else if(isSpace(userInput[i])){
-            if(os.str() != ""){
-                tokens.push_back(os.str());
-                os.str("");
-            }
+    ostringstream token;
+    for(string :: iterator iter = userInput.begin(); iter != userInput.end(); iter++){
+        if(isEscapeCharacter(*iter)){
+            token << *(++iter);
+        } else if (isSpecialCharacter(*iter)){
+            addToken(tokens, token);
+            clearToken(token);
+
+            token << *iter;
+
+            addToken(tokens, token);
+            clearToken(token);
+        } else if(isSpace(*iter)){
+            addToken(tokens, token);
+            clearToken(token);
         } else {
-            os << userInput[i];
+            token << *iter;
         }
     }
-    if(os.str() != ""){
-        tokens.push_back(os.str());
+    //Insert last token
+    addToken(token);
     }
     return tokens;
 }
@@ -83,4 +84,13 @@ bool isEscapeCharacter(char c){
 
 bool isSpace(char c){
     return isspace(c) != 0;
+}
+
+void addToken(list<string> &tokens, ostringstream &token){
+    if(token.str() != ""){
+        tokens.push_back(token.str());
+    }
+}
+void clearToken(ostringstream &token){
+    token.str("");
 }
