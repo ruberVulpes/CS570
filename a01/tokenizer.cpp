@@ -45,6 +45,8 @@ int main() {
         printLinkedList(tokens);
         free(input);
     }
+    //To reset outer shell indents
+    cout << endl;
     return 0;
 }
 
