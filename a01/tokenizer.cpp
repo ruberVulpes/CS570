@@ -60,13 +60,9 @@ list <string> readInput() {
                 setQuoteFlags(*iter, insideSingleQuotes, insideDoubleQuotes);
                 //Ending a double quote section
             } else if (*iter == '\"' && insideDoubleQuotes) {
-                addToken(tokens, token);
-                clearToken(token);
                 insideDoubleQuotes = false;
                 //Ending a single quote section
             } else if (*iter == '\'' && insideSingleQuotes) {
-                addToken(tokens, token);
-                clearToken(token);
                 insideSingleQuotes = false;
             } else {
                 token << *(iter);
