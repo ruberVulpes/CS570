@@ -2,6 +2,7 @@
 // Created by William Fox on 1/24/19.
 //
 #include <cstdio>
+#include <stdlib.h>
 #include <readline/readline.h>
 #include <string>
 #include <sstream>
@@ -45,8 +46,14 @@ list <string> readInput() {
     bool insideSingleQuotes = false;
     list <string> tokens;
     ostringstream token;
+    
 
-    string userInput = readline(">");
+    char *input = readline(">");
+    if(!input){
+        return tokens;
+    }
+    string userInput = input;
+    free(input);
 
     for (string::iterator iter = userInput.begin(); iter != userInput.end(); iter++) {
         if (isEscapeCharacter(*iter) && !insideSingleQuotes) {
@@ -89,6 +96,7 @@ list <string> readInput() {
 
 void printLinkedList(list <string> tokens) {
     if (tokens.size() == 0){
+	cout << endl;
 	return;
     }
     cout << "[";
