@@ -88,6 +88,9 @@ list <string> readInput() {
 }
 
 void printLinkedList(list <string> tokens) {
+    if (tokens.size() == 0){
+	return;
+    }
     cout << "[";
     for (list<string>::iterator it = tokens.begin(); it != tokens.end(); it++) {
         cout << "{" << *it << "}";
