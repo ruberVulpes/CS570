@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <stdlib.h>
 #include <readline/readline.h>
+#include <readline/history.h>
 #include <string>
 #include <sstream>
 #include <list>
@@ -14,7 +15,7 @@ using namespace std;
 
 void printLinkedList(list <string> tokens);
 
-list <string> readInput();
+list <string> readInput(string userInput);
 
 bool isNewToken(char c);
 
@@ -36,24 +37,22 @@ void clearToken(ostringstream &token);
 void setQuoteFlags(char c, bool &isSingleQuote, bool &isDoubleQuote);
 
 int main() {
-    list <string> tokens = readInput();
-    printLinkedList(tokens);
+    list <string> tokens;
+    char *input;
+    while((input = readline(">"))){
+        add_history(input);
+        tokens = readInput(string(input));
+        printLinkedList(tokens);
+        free(input);
+    }
     return 0;
 }
 
-list <string> readInput() {
+list <string> readInput(string userInput) {
     bool insideDoubleQuotes = false;
     bool insideSingleQuotes = false;
     list <string> tokens;
     ostringstream token;
-    
-
-    char *input = readline(">");
-    if(!input){
-        return tokens;
-    }
-    string userInput = input;
-    free(input);
 
     for (string::iterator iter = userInput.begin(); iter != userInput.end(); iter++) {
         if (isEscapeCharacter(*iter) && !insideSingleQuotes) {
@@ -96,8 +95,7 @@ list <string> readInput() {
 
 void printLinkedList(list <string> tokens) {
     if (tokens.size() == 0){
-	cout << endl;
-	return;
+	    return;
     }
     cout << "[";
     for (list<string>::iterator it = tokens.begin(); it != tokens.end(); it++) {
