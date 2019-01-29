@@ -17,8 +17,6 @@ void printLinkedList(list <string> tokens);
 
 list <string> readInput(string userInput);
 
-bool isNewToken(char c);
-
 bool isSpecialCharacter(char c);
 
 bool isEscapeCharacter(char c);
