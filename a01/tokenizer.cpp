@@ -94,7 +94,7 @@ list <string> readInput(string userInput) {
 }
 
 void printLinkedList(list <string> tokens) {
-    if (tokens.size() == 0){
+    if (tokens.empty()){
 	    return;
     }
     cout << "[";
