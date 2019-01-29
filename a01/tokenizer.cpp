@@ -132,7 +132,8 @@ bool isQuote(char c) {
 }
 
 void addToken(list <string> &tokens, ostringstream &token) {
-    if (token.str() != "") {
+        //Don't add empty tokens
+    if (!token.str().empty()) {
         tokens.push_back(token.str());
     }
 }
