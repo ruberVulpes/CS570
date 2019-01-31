@@ -1,5 +1,6 @@
 //
-// Created by William Fox on 1/24/19.
+// Created by William Fox, cssc1084, on 1/24/19.
+// For Operating Systems @ SDSU Spring 2019
 //
 #include <cstdio>
 #include <cstdlib>
