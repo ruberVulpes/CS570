@@ -22,6 +22,8 @@ list<string> readInput(string userInput);
 //Returns true if c is one of |, ;, <, >, &
 bool isSpecialCharacter(char c);
 
+bool isSpecialCharacter(string c);
+
 //Returns true if c is '\'
 bool isEscapeCharacter(char c);
 
@@ -32,13 +34,15 @@ bool isSpace(char c);
 bool isQuote(char c);
 
 //adds non empty Token to end of the passed List
-void addToken(list<string> &tokens, ostringstream &token);
+void addToken(list<string> &tokenList, ostringstream &token);
 
 //clears current ostringstream (ie the token)
 void clearToken(ostringstream &token);
 
 //A helper function to set the corresponding flags for a quote character
 void setQuoteFlags(char c, bool &isSingleQuote, bool &isDoubleQuote);
+
+list<string> cleanTokens(list<string> &tokenList);
 
 int main() {
     list<string> tokens;
@@ -47,6 +51,7 @@ int main() {
         add_history(input);
         tokens = readInput(string(input));
         printLinkedList(tokens);
+        printLinkedList(cleanTokens(tokens));
         free(input);
     }
     //Print newline to reset outer shell
@@ -54,10 +59,34 @@ int main() {
     return 0;
 }
 
+list<string> cleanTokens(list<string> &tokenList) {
+    list<string> cleanTokenList;
+    for (list<string>::iterator iter = tokenList.begin(); iter != tokenList.end(); iter++) {
+        if (isSpecialCharacter(*iter)) {
+            if (*iter == "|") {
+                cout << "Pipe not implemented" << endl;
+                cleanTokenList.push_back(";");
+            } else if (*iter == ";") {
+                cleanTokenList.push_back(*iter);
+            } else {
+                cout << "IO redirection and background not implemented" << endl;
+                if ((*iter == "<" || *iter == ">") && iter != --tokenList.end()) {
+                    //Skip over IO redirection argument
+                    iter++;
+                }
+            }
+        } else {
+            cleanTokenList.push_back(*iter);
+        }
+    }
+    return cleanTokenList;
+}
+
+
 list<string> readInput(string userInput) {
     bool insideDoubleQuotes = false;
     bool insideSingleQuotes = false;
-    list<string> tokens;
+    list<string> tokenList;
     ostringstream token;
 
     for (string::iterator iter = userInput.begin(); iter != userInput.end(); iter++) {
@@ -83,23 +112,23 @@ list<string> readInput(string userInput) {
             }
         } else if (isSpecialCharacter(*iter) && !insideSingleQuotes && !insideDoubleQuotes) {
             //End/Add old token
-            addToken(tokens, token);
+            addToken(tokenList, token);
             clearToken(token);
             //Insert special char
             token << *iter;
             //End/Add special char token
-            addToken(tokens, token);
+            addToken(tokenList, token);
             clearToken(token);
         } else if (isSpace(*iter) && !insideSingleQuotes && !insideDoubleQuotes) {
-            addToken(tokens, token);
+            addToken(tokenList, token);
             clearToken(token);
         } else {
             token << *iter;
         }
     }
     //Insert last token
-    addToken(tokens, token);
-    return tokens;
+    addToken(tokenList, token);
+    return tokenList;
 }
 
 void printLinkedList(list<string> tokens) {
@@ -128,6 +157,10 @@ bool isSpecialCharacter(char c) {
     return false;
 }
 
+bool isSpecialCharacter(string c) {
+    return isSpecialCharacter(c.at(0));
+}
+
 bool isEscapeCharacter(char c) {
     return c == '\\';
 }
@@ -140,10 +173,10 @@ bool isQuote(char c) {
     return c == '\"' || c == '\'';
 }
 
-void addToken(list<string> &tokens, ostringstream &token) {
+void addToken(list<string> &tokenList, ostringstream &token) {
     //Don't add empty tokens
     if (!token.str().empty()) {
-        tokens.push_back(token.str());
+        tokenList.push_back(token.str());
     }
 }
 
