@@ -1,5 +1,5 @@
 //
-// Created by William Fox, cssc1084, on 1/24/19.
+// Created by William Fox, cssc1084, on 2/7/19.
 // For Operating Systems @ SDSU Spring 2019
 //
 #include <cstdio>
@@ -11,6 +11,8 @@
 #include <list>
 #include <iterator>
 #include <iostream>
+#include <unistd.h>
+
 
 using namespace std;
 
@@ -46,6 +48,8 @@ list<string> cleanTokens(list<string> tokenList);
 
 list<list<string> > splitCommands(list<string> cleanTokenList);
 
+void executeCommands(list<list<string> > cleanCommandList);
+
 int main() {
     list<string> tokenList;
     list<string> cleanTokenList;
@@ -56,14 +60,16 @@ int main() {
         tokenList = readInput(string(input));
         cout << "Dirty" << endl;
         printLinkedList(tokenList);
-        cout << "Clean"<< endl;
+        cout << "Clean" << endl;
         cleanTokenList = cleanTokens(tokenList);
         printLinkedList(cleanTokenList);
         cout << "Seperated" << endl;
         cleanCommandList = splitCommands(cleanTokenList);
-        for(list<list<string> >::iterator iter = cleanCommandList.begin(); iter != cleanCommandList.end(); iter++){
-            printLinkedList(*iter);
+        for (auto &iter : cleanCommandList) {
+            printLinkedList(iter);
         }
+        cout << "exe" << endl;
+        executeCommands(cleanCommandList);
         cout << "end" << endl;
         free(input);
     }
@@ -95,23 +101,54 @@ list<string> cleanTokens(list<string> tokenList) {
     return cleanTokenList;
 }
 
-list<list<string> > splitCommands(list<string> cleanTokenList){
+list<list<string> > splitCommands(list<string> cleanTokenList) {
     list<list<string> > cleanCommandList;
     list<string> currentCleanCommand;
-    for(list<string>::iterator iter = cleanTokenList.begin(); iter != cleanTokenList.end(); iter++){
-        if(*iter == ";"){
-            if(!currentCleanCommand.empty()){
+    for (list<string>::iterator iter = cleanTokenList.begin(); iter != cleanTokenList.end(); iter++) {
+        if (*iter == ";") {
+            if (!currentCleanCommand.empty()) {
                 cleanCommandList.push_back(currentCleanCommand);
-                currentCleanCommand.clear();
+                currentCleanCommand.erase(currentCleanCommand.begin(), currentCleanCommand.end());
             }
         } else {
             currentCleanCommand.push_back(*iter);
         }
     }
-    if(!currentCleanCommand.empty()) {
+    if (!currentCleanCommand.empty()) {
         cleanCommandList.push_back(currentCleanCommand);
     }
-        return cleanCommandList;
+    return cleanCommandList;
+}
+
+void executeCommands(list<list<string> > cleanCommandList) {
+    int commandTokenSize;
+    for (list<list<string> >::iterator iter = cleanCommandList.begin(); iter != cleanCommandList.end(); iter++) {
+        commandTokenSize = iter->size();
+        char *argv[commandTokenSize + 1];
+        for (list<string>::iterator commandIter = iter->begin(); commandIter != iter->end(); commandIter++) {
+            if (*commandIter == "pwd") {
+                char buff[FILENAME_MAX];
+                if (!getcwd(buff, FILENAME_MAX)) {
+                    cout << "Unable to obtain current directory" << endl;
+                } else {
+                    cout << buff << endl;
+                }
+                break;
+            } else if (*commandIter == "cd") {
+                if (commandTokenSize != 2) {
+                    cout << "Accepts exactly one argument" << endl;
+                } else {
+                    const char * directory = next(commandIter, 1)->c_str();
+                    if (chdir(directory) != 0) {
+                        cout << "Directory does not exist or is not accessible" << endl;
+                    }
+                    break;
+                }
+            } else {
+                continue;
+            }
+        }
+    }
 }
 
 list<string> readInput(string userInput) {
