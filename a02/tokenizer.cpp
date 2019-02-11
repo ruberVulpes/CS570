@@ -155,7 +155,7 @@ void executeCommands(list<list<string> > cleanCommandList) {
                 if(execvp(argv[0], argv))
                     cout << "Unable to execute " << argv[0] << endl;
             } else if (childPid > 0) {
-                wait(&childPid);
+                wait(NULL);
             } else {
                 cout << "Unable to spawn program" << endl;
             }
