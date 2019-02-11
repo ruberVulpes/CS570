@@ -42,16 +42,29 @@ void clearToken(ostringstream &token);
 //A helper function to set the corresponding flags for a quote character
 void setQuoteFlags(char c, bool &isSingleQuote, bool &isDoubleQuote);
 
-list<string> cleanTokens(list<string> &tokenList);
+list<string> cleanTokens(list<string> tokenList);
+
+list<list<string> > splitCommands(list<string> cleanTokenList);
 
 int main() {
-    list<string> tokens;
+    list<string> tokenList;
+    list<string> cleanTokenList;
+    list<list<string> > cleanCommandList;
     char *input;
     while ((input = readline(">"))) {
         add_history(input);
-        tokens = readInput(string(input));
-        printLinkedList(tokens);
-        printLinkedList(cleanTokens(tokens));
+        tokenList = readInput(string(input));
+        cout << "Dirty" << endl;
+        printLinkedList(tokenList);
+        cout << "Clean"<< endl;
+        cleanTokenList = cleanTokens(tokenList);
+        printLinkedList(cleanTokenList);
+        cout << "Seperated" << endl;
+        cleanCommandList = splitCommands(cleanTokenList);
+        for(list<list<string> >::iterator iter = cleanCommandList.begin(); iter != cleanCommandList.end(); iter++){
+            printLinkedList(*iter);
+        }
+        cout << "end" << endl;
         free(input);
     }
     //Print newline to reset outer shell
@@ -59,7 +72,7 @@ int main() {
     return 0;
 }
 
-list<string> cleanTokens(list<string> &tokenList) {
+list<string> cleanTokens(list<string> tokenList) {
     list<string> cleanTokenList;
     for (list<string>::iterator iter = tokenList.begin(); iter != tokenList.end(); iter++) {
         if (isSpecialCharacter(*iter)) {
@@ -82,6 +95,24 @@ list<string> cleanTokens(list<string> &tokenList) {
     return cleanTokenList;
 }
 
+list<list<string> > splitCommands(list<string> cleanTokenList){
+    list<list<string> > cleanCommandList;
+    list<string> currentCleanCommand;
+    for(list<string>::iterator iter = cleanTokenList.begin(); iter != cleanTokenList.end(); iter++){
+        if(*iter == ";"){
+            if(!currentCleanCommand.empty()){
+                cleanCommandList.push_back(currentCleanCommand);
+                currentCleanCommand.clear();
+            }
+        } else {
+            currentCleanCommand.push_back(*iter);
+        }
+    }
+    if(!currentCleanCommand.empty()) {
+        cleanCommandList.push_back(currentCleanCommand);
+    }
+        return cleanCommandList;
+}
 
 list<string> readInput(string userInput) {
     bool insideDoubleQuotes = false;
