@@ -58,19 +58,19 @@ int main() {
     while ((input = readline(">"))) {
         add_history(input);
         tokenList = readInput(string(input));
-        cout << "Dirty" << endl;
-        printLinkedList(tokenList);
-        cout << "Clean" << endl;
+//        cout << "Dirty" << endl;
+//        printLinkedList(tokenList);
+//        cout << "Clean" << endl;
         cleanTokenList = cleanTokens(tokenList);
-        printLinkedList(cleanTokenList);
-        cout << "Seperated" << endl;
+//        printLinkedList(cleanTokenList);
+//        cout << "Seperated" << endl;
         cleanCommandList = splitCommands(cleanTokenList);
-        for (auto &iter : cleanCommandList) {
-            printLinkedList(iter);
-        }
-        cout << "exe" << endl;
+//        for (auto &iter : cleanCommandList) {
+//            printLinkedList(iter);
+//        }
+//        cout << "exe" << endl;
         executeCommands(cleanCommandList);
-        cout << "end" << endl;
+//        cout << "end" << endl;
         free(input);
     }
     //Print newline to reset outer shell
