@@ -137,7 +137,8 @@ void executeCommands(list<list<string> > cleanCommandList) {
             if (commandTokenSize != 2) {
                 cout << "Accepts exactly one argument" << endl;
             } else {
-                const char * directory = next(commandIter, 1)->c_str();
+                commandIter++;
+                const char * directory = commandIter->c_str();
                 if (chdir(directory) != 0) {
                     cout << "Directory does not exist or is not accessible" << endl;
                 }
