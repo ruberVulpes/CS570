@@ -151,12 +151,17 @@ void executeCommands(list<list<string> > cleanCommandList) {
                 commandIter++;
             }
             argv[commandTokenSize] = NULL;
-            int childPid = fork();
+            pid_t childPid = fork();
+            int status;
             if(childPid == 0){
                 if(execvp(argv[0], argv))
                     cout << "Unable to execute " << argv[0] << endl;
             } else if (childPid > 0) {
-                wait(NULL);
+                if(wait(&status) < 0){
+                    cout << "Process exited with error" << endl;
+                } else {
+                    cout << "Process exited successfully" << endl;
+                }
             } else {
                 cout << "Unable to spawn program" << endl;
             }
