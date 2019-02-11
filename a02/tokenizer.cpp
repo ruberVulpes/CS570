@@ -45,10 +45,11 @@ void clearToken(ostringstream &token);
 //A helper function to set the corresponding flags for a quote character
 void setQuoteFlags(char c, bool &isSingleQuote, bool &isDoubleQuote);
 
+//Removes unimplemented special characters and replaces pipes with semicolons
 list<string> cleanTokens(list<string> tokenList);
-
+//Splits cleanTokenList into seperate commands (if any)
 list<list<string> > splitCommands(list<string> cleanTokenList);
-
+//Executes list of commands given
 void executeCommands(list<list<string> > cleanCommandList);
 
 int main() {
@@ -59,19 +60,9 @@ int main() {
     while ((input = readline(">"))) {
         add_history(input);
         tokenList = readInput(string(input));
-//        cout << "Dirty" << endl;
-//        printLinkedList(tokenList);
-//        cout << "Clean" << endl;
         cleanTokenList = cleanTokens(tokenList);
-//        printLinkedList(cleanTokenList);
-//        cout << "Seperated" << endl;
         cleanCommandList = splitCommands(cleanTokenList);
-//        for (auto &iter : cleanCommandList) {
-//            printLinkedList(iter);
-//        }
-//        cout << "exe" << endl;
         executeCommands(cleanCommandList);
-//        cout << "end" << endl;
         free(input);
     }
     //Print newline to reset outer shell
