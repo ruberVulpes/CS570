@@ -1,4 +1,4 @@
-CC = G++
+CC = g++
 
 mush: driver.o
 	${CC} -g -o mush driver.o command.o tokenizer.o -lreadline
