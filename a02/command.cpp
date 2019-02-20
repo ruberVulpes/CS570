@@ -40,8 +40,10 @@ void execute_commands(list<list<string> > cleanCommandList) {
             pid_t childPid = fork();
             int status;
             if (childPid == 0) {
-                if (execvp(argv[0], argv))
+                if (execvp(argv[0], argv)) {
                     cout << "Unable to execute " << argv[0] << endl;
+                    exit(1);
+                }
             } else if (childPid > 0) {
                 if (wait(&status) < 0) {
                     cout << "Process exited with error" << endl;
