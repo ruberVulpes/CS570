@@ -22,7 +22,7 @@ void printLinkedList(list<string> tokens);
 //Returns a linked list of tokenized strings
 list<string> readInput(string userInput);
 
-//Returns true ifls
+//Returns true if
 //c is one of |, ;, <, >, &
 bool isSpecialCharacter(char c);
 

@@ -16,6 +16,7 @@
 #include <sys/wait.h>
 
 using namespace std;
+
 //Executes list of commands given, expects commands to have been cleaned
 void execute_commands(list<list<string> > cleanCommandList);
 

@@ -12,6 +12,7 @@
 #include "command.h"
 
 using namespace std;
+
 //Removes unimplemented special characters and replaces pipes with semicolons
 list<string> cleanTokens(list<string> tokenList);
 
