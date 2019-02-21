@@ -1,6 +1,6 @@
 //
-// Created by William Fox on 2019-02-19.
-//
+// Created by William Fox, cssc1084 on 2019-02-19.
+// For Operating Systems @ SDSU Spring 2019
 
 #ifndef CS570_TOKENIZER_H
 #define CS570_TOKENIZER_H

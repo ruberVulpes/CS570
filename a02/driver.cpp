@@ -1,6 +1,6 @@
 //
-// Created by William Fox on 2019-02-19.
-//
+// Created by William Fox, cssc1084 on 2019-02-19.
+// For Operating Systems @ SDSU Spring 2019
 
 #include <iostream>
 #include <readline/readline.h>
@@ -42,6 +42,7 @@ list<string> cleanTokens(list<string> tokenList) {
         if (isSpecialCharacter(*iter)) {
             if (*iter == "|") {
                 cout << "Pipe not implemented" << endl;
+                //Turn |'s into ; for easier checking when splitting commands
                 cleanTokenList.push_back(";");
             } else if (*iter == ";") {
                 cleanTokenList.push_back(*iter);

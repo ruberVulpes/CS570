@@ -1,6 +1,6 @@
 //
-// Created by William Fox on 2019-02-19.
-//
+// Created by William Fox, cssc1084 on 2019-02-19.
+// For Operating Systems @ SDSU Spring 2019
 
 #include "command.h"
 
@@ -9,10 +9,12 @@ using namespace std;
 void execute_commands(list<list<string> > cleanCommandList) {
     int commandTokenSize;
     for (list<list<string> >::iterator iter = cleanCommandList.begin(); iter != cleanCommandList.end(); iter++) {
+        //Number of tokens in current command
         commandTokenSize = iter->size();
         char *argv[commandTokenSize + 1];
         list<string>::iterator commandIter = iter->begin();
         if (*commandIter == "pwd") {
+            // Built in size
             char buff[FILENAME_MAX];
             if (!getcwd(buff, FILENAME_MAX)) {
                 cout << "Unable to obtain current directory" << endl;
@@ -31,6 +33,7 @@ void execute_commands(list<list<string> > cleanCommandList) {
             }
         } else {
             for (int i = 0; i < commandTokenSize; i++) {
+                //Needs extra castHelper to go from string -> char * (non const)
                 char *castHelper = new char[commandIter->length() + 1];
                 strcpy(castHelper, commandIter->c_str());
                 argv[i] = castHelper;
@@ -40,6 +43,7 @@ void execute_commands(list<list<string> > cleanCommandList) {
             pid_t childPid = fork();
             int status;
             if (childPid == 0) {
+                //If execvp returns anything there was an error
                 if (execvp(argv[0], argv)) {
                     cout << "Unable to execute " << argv[0] << endl;
                     exit(1);
