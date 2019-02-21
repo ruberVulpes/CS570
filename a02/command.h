@@ -6,6 +6,9 @@
 #define CS570_COMMAND_H
 
 #include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <string>
 #include <list>
 #include <unistd.h>
