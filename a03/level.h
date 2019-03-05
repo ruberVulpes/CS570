@@ -5,6 +5,9 @@
 #ifndef CS570_LEVEL_H
 #define CS570_LEVEL_H
 
+#include <stdexcept>
+#include <string>
+
 #include "page_table.h"
 #include "map.h"
 
@@ -19,6 +22,9 @@ private:
 public:
     Level(int, bool, PAGETABLE*);
     ~Level();
+    Level *getSubLevel(int);
+    MAP *getMap(int);
+
 
 };
 

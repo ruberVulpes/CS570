@@ -8,7 +8,21 @@
 
 #include <iostream>
 using namespace std;
+
+void testMap();
+void testPageTable();
+
 int main(){
+    testPageTable();
+    testMap();
+}
+
+void testPageTable(){
+    int testArr[] = {8, 8, 8};
+    PAGETABLE(3, testArr);
+}
+
+void testMap(){
     MAP map = MAP(100);
     map.insertPageNumber(50, 100);
     map.insertPageNumber(75, 200);

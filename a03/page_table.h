@@ -6,6 +6,7 @@
 #define CS570_PAGE_TABLE_H
 
 #include "level.h"
+#define ADDRESS_SIZE 32
 
 class  Level;
 class PAGETABLE {
@@ -15,10 +16,12 @@ public:
     int *levelShiftArray;
     int *entryCountArray;
 
+    PAGETABLE(int, int*);
+    ~PAGETABLE();
+
+private:
     Level *rootNodePtr;
-
-public:
-
+    int currentFrame = 0;
 };
 
 #endif //CS570_PAGE_TABLE_H

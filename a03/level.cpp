@@ -3,19 +3,21 @@
 //
 
 #include "level.h"
+using namespace std;
 
 Level::Level(int depth, bool isLeafLevel, PAGETABLE* pageTablePtr) {
     Level::depth = depth;
     Level::isLeafLevel = isLeafLevel;
     Level::pageTablePtr = pageTablePtr;
+    Level::mapPtr = nullptr;
     if(isLeafLevel){
-        int mapSize = Level::pageTablePtr->entryCountArray[depth];
-        Level::mapPtr = new MAP(mapSize);
         Level::nextLevelPtr = nullptr;
     } else {
         int nextLevelSize = Level::pageTablePtr->entryCountArray[depth];
         Level::nextLevelPtr = new Level*[nextLevelSize];
-        Level::mapPtr = nullptr;
+        for(int i = 0; i < nextLevelSize; i++){
+            nextLevelPtr[i] = nullptr;
+        }
     }
 }
 
@@ -30,4 +32,26 @@ Level::~Level() {
         delete nextLevelPtr;
     }
 
+}
+
+Level *Level::getSubLevel(int subLevel) {
+    if(isLeafLevel){
+        throw runtime_error("Unable to get Sub-Level from a Leaf Level");
+    }
+    if(nextLevelPtr[subLevel] == nullptr){
+        bool isChildLeaf = pageTablePtr->levelCount == depth + 1;
+        nextLevelPtr[subLevel] = new Level(depth+1, isChildLeaf, pageTablePtr);
+    }
+    return nextLevelPtr[subLevel];
+}
+
+MAP *Level::getMap(int) {
+    if(!isLeafLevel){
+        throw runtime_error("Unable to get Map from a non-Leaf Level");
+    }
+    if(mapPtr == nullptr){
+        int mapSize = Level::pageTablePtr->entryCountArray[depth];
+        mapPtr = new MAP(mapSize);
+    }
+    return mapPtr;
 }

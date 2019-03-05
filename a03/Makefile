@@ -1,6 +1,6 @@
 CC = g++
 
-main:
-	${CC} -g -o main
+pagetable:
+	${CC} -g -o pagetable
 clean:
-	rm *.o main
+	rm *.o pagetable
