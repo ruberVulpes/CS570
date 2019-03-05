@@ -21,7 +21,6 @@ public:
 
 private:
     Level *rootNodePtr;
-    int currentFrame = 0;
 };
 
 #endif //CS570_PAGE_TABLE_H
