@@ -26,7 +26,9 @@ public:
     ~Level();
     Level *getSubLevel(int);
     MAP *getMap(int);
-
+    bool insert(unsigned int, unsigned int);
+    int getFrameNumber(unsigned int);
+    int sizeTotal();
 
 };
 

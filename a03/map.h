@@ -17,9 +17,10 @@ public:
     MAP(int);
     ~MAP();
     int getFrameNumber(int pageNumber);
-    void insertPageNumber(int pageNumber, int frameNumber);
-    int invalidatePageNumber(int pageNumber);
+    bool insertPageNumber(int pageNumber, int frameNumber);
+    unsigned int invalidatePageNumber(int pageNumber);
     bool invalidateFrameNumber(int frameNumber);
+    int sizeTotal();
 };
 
 #endif //CS570_MAP_H

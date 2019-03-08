@@ -7,19 +7,23 @@
 
 #include "level.h"
 #define ADDRESS_SIZE 32
+#define SELF_DEPTH 0
+#define nullptr 0
 
 class  Level;
 class PAGETABLE {
 public:
-    int levelCount;
-    int *levelBitmaskArray;
-    int *levelShiftArray;
-    int *entryCountArray;
+    unsigned int levelCount;
+    unsigned int *levelBitmaskArray;
+    unsigned int *levelShiftArray;
+    unsigned int *entryCountArray;
 
-    PAGETABLE(int, int*);
+    PAGETABLE(unsigned int, int*);
     ~PAGETABLE();
+    bool insert(unsigned int, unsigned int);
+    int getFrameNumber(unsigned int);
 
-private:
+//private:
     Level *rootNodePtr;
 };
 

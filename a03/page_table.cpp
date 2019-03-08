@@ -4,11 +4,13 @@
 
 #include "page_table.h"
 
-PAGETABLE::PAGETABLE(int levelCount, int *bitsPerLevel) {
+PAGETABLE::PAGETABLE(unsigned int levelCount, int *bitsPerLevel) {
     PAGETABLE::levelCount = levelCount;
-    levelBitmaskArray = new int[PAGETABLE::levelCount];
-    levelShiftArray = new int[PAGETABLE::levelCount];
-    entryCountArray = new int[PAGETABLE::levelCount];
+    levelBitmaskArray = new unsigned int[PAGETABLE::levelCount];
+    levelShiftArray = new unsigned int[PAGETABLE::levelCount];
+    entryCountArray = new unsigned int[PAGETABLE::levelCount];
+    rootNodePtr = nullptr;
+
     int offset = ADDRESS_SIZE;
     for (int i = 0; i < PAGETABLE::levelCount; i++) {
         offset -= bitsPerLevel[i];
@@ -23,8 +25,6 @@ PAGETABLE::PAGETABLE(int levelCount, int *bitsPerLevel) {
         entryCountArray[i] = 1 << bitsForLevel;
         cumulativeBitCount += bitsForLevel;
     }
-    rootNodePtr = new Level(0, 0 == levelCount, this);
-
 };
 
 PAGETABLE::~PAGETABLE() {
@@ -32,4 +32,18 @@ PAGETABLE::~PAGETABLE() {
     delete levelShiftArray;
     delete entryCountArray;
     delete rootNodePtr;
+}
+
+bool PAGETABLE::insert(unsigned int logicalAddress, unsigned int frameNumber){
+    if(rootNodePtr == nullptr){
+        rootNodePtr = new Level(0, 0 == levelCount, this);
+    }
+    return rootNodePtr->insert(logicalAddress, frameNumber);
+}
+
+int PAGETABLE::getFrameNumber(unsigned int logicalAddress) {
+    if(rootNodePtr == nullptr){
+        return INVALID;
+    }
+    return rootNodePtr->getFrameNumber(logicalAddress);
 }

@@ -1,6 +1,6 @@
 CC = g++
 
-pagetable:
-	${CC} -g -o pagetable
+pagetable: driver.cpp
+	${CC} -g -o pagetable driver.cpp
 clean:
 	rm *.o pagetable

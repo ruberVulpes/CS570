@@ -20,11 +20,15 @@ int MAP::getFrameNumber(int pageNumber) {
     return frameMapping[pageNumber];
 }
 
-void MAP::insertPageNumber(int pageNumber, int frameNumber) {
+bool MAP::insertPageNumber(int pageNumber, int frameNumber) {
+    if(frameMapping[pageNumber] != INVALID){
+        return FAILURE;
+    }
     frameMapping[pageNumber] = frameNumber;
+    return SUCCESS;
 }
 
-int MAP::invalidatePageNumber(int pageNumber) {
+unsigned int MAP::invalidatePageNumber(int pageNumber) {
     int currentFrameNumber = frameMapping[pageNumber];
     frameMapping[pageNumber] = INVALID;
     return currentFrameNumber;
@@ -38,4 +42,8 @@ bool MAP::invalidateFrameNumber(int frameNumber) {
         }
     }
     return FAILURE;
+}
+
+int MAP::sizeTotal() {
+    return sizeof(size) + sizeof(frameMapping) + sizeof(int) * size;
 }
