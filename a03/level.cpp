@@ -100,15 +100,15 @@ int Level::sizeTotal() {
     basicSize += sizeof(nextLevelPtr) + sizeof(mapPtr);
     int subSize = 0;
     if(isLeafLevel){
-        if(mapPtr == nullptr){
+        if(mapPtr == NULL){
             return basicSize;
         }
-        return basicSize += mapPtr->sizeTotal();
+        return basicSize + mapPtr->sizeTotal();
     }
     for (int i = 0; i < pageTablePtr->entryCountArray[depth]; i++) {
-        if(nextLevelPtr != nullptr){
+        if(nextLevelPtr[i] != NULL){
             subSize += nextLevelPtr[i]->sizeTotal();
         }
     }
-    return 0;
+    return basicSize + subSize;
 }
