@@ -22,6 +22,7 @@ public:
     ~PAGETABLE();
     bool insert(unsigned int, unsigned int);
     int getFrameNumber(unsigned int);
+    int sizeTotal();
 
 //private:
     Level *rootNodePtr;

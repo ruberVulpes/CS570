@@ -13,19 +13,20 @@ void testMap();
 void testPageTable();
 
 int main(){
-//    testPageTable();
-    testMap();
+    testPageTable();
+//    testMap();
 }
 
 void testPageTable(){
     int testArr[] = {8, 8, 8};
     PAGETABLE pagetable = PAGETABLE(3, testArr);
+    cout << "Size: " << pagetable.sizeTotal() << endl;
     cout << pagetable.insert(0xFE0123C2, 4) << endl;
-    cout << sizeof(pagetable.rootNodePtr) << endl;
+    cout << "Size: " << pagetable.sizeTotal() << endl;
     cout << pagetable.insert(0xFF0124C4, 222) << endl;
-    cout << sizeof(pagetable.rootNodePtr) << endl;
+    cout << "Size: " << pagetable.sizeTotal() << endl;
     cout << pagetable.insert(0x010124C4, 222) << endl;
-    cout << sizeof(pagetable) << endl;
+    cout << "Size: " << pagetable.sizeTotal() << endl;
     cout << pagetable.getFrameNumber(0xFF0124C4) << endl;
     cout << pagetable.getFrameNumber(0xFE0120C4) << endl;
 }

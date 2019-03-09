@@ -47,3 +47,14 @@ int PAGETABLE::getFrameNumber(unsigned int logicalAddress) {
     }
     return rootNodePtr->getFrameNumber(logicalAddress);
 }
+
+int PAGETABLE::sizeTotal() {
+    int basicSize = sizeof(levelBitmaskArray) + sizeof(levelShiftArray);
+    basicSize += sizeof(entryCountArray);
+    basicSize *= levelCount;
+    basicSize += sizeof(levelCount) + sizeof(rootNodePtr);
+    if(rootNodePtr == nullptr){
+        return basicSize;
+    }
+    return basicSize + rootNodePtr->sizeTotal();
+}
