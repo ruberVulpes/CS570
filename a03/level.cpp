@@ -28,9 +28,9 @@ Level::~Level() {
     } else {
         int nextLevelSize = Level::pageTablePtr->entryCountArray[depth];
         for (int i = 0; i < nextLevelSize; i++) {
-            delete nextLevelPtr[i];
+            delete[] nextLevelPtr[i];
         }
-        delete nextLevelPtr;
+        delete[] nextLevelPtr;
     }
 
 }

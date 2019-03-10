@@ -78,8 +78,8 @@ int main(int argc, char *argv[]){
         }
     }
     cout << hits << " " << misses << " " << pagetable.sizeTotal() << endl;
-
-    return 0;
+    fclose(filePointer);
+//    return 0;
 }
 int pageInsert(PAGETABLE * pt, unsigned int logicalAddr, unsigned int frame){
     if(pt->insert(logicalAddr, frame)){
