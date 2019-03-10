@@ -78,7 +78,7 @@ int main(int argc, char *argv[]){
             break;
         }
     }
-
+    free(filePointer);
     cout << hits << " " << misses << " " << pagetable.sizeTotal() << endl;
 
     return 0;
