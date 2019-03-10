@@ -14,9 +14,10 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-
+#include <iomanip>
 using namespace std;
 int pageInsert(PAGETABLE * pt, unsigned int logicalAddr, unsigned int frame);
+void printHelper(int size, int hits, int missess, int pageSize);
 int main(int argc, char *argv[]){
     int argumentCount = 1;
     int nFlag = 0;
@@ -70,16 +71,14 @@ int main(int argc, char *argv[]){
             }
         } else {
             break;
-//            fprintf(stderr, "Unable to get next trace %d \n", hits + misses);
-//            exit(GET_NEXT_TRACE_ERROR);
         }
         if(traceLimit <= hits + misses && nFlag == 1){
             break;
         }
     }
-    cout << hits << " " << misses << " " << pagetable.sizeTotal() << endl;
     fclose(filePointer);
-//    return 0;
+    int pageSize = pagetable.entryCountArray[levelCount];
+    printHelper(pagetable.sizeTotal(), hits, misses, pageSize);
 }
 int pageInsert(PAGETABLE * pt, unsigned int logicalAddr, unsigned int frame){
     if(pt->insert(logicalAddr, frame)){
@@ -89,3 +88,11 @@ int pageInsert(PAGETABLE * pt, unsigned int logicalAddr, unsigned int frame){
     }
 }
 
+void printHelper(int size, int hits, int missess, int pageSize){
+    double total = hits + missess;
+    cout << "Page table size: " << pageSize << endl;
+    cout <<  setprecision(4) << "Hits " << hits << " (" << hits/total * 100;
+    cout << "%), Misses " << missess << " (" << missess/total * 100 << "%) ";
+    cout << setprecision(100) << "# Addressess " << total << endl;
+    cout << "Bytes used: " << size << endl;
+}
