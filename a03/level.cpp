@@ -27,8 +27,10 @@ Level::~Level() {
         delete mapPtr;
     } else {
         int nextLevelSize = Level::pageTablePtr->entryCountArray[depth];
-        for (int i = 0; i < nextLevelSize; i++) {
-            delete[] nextLevelPtr[i];
+        if (nextLevelPtr != nullptr) {
+            for (int i = 0; i < nextLevelSize; i++) {
+                delete nextLevelPtr[i];
+            }
         }
         delete[] nextLevelPtr;
     }
@@ -87,7 +89,7 @@ int Level::getFrameNumber(unsigned int logicalAddress) {
             return mapPtr->getFrameNumber(location);
         }
     } else {
-        if(nextLevelPtr[location] == nullptr){
+        if (nextLevelPtr[location] == nullptr) {
             return INVALID;
         } else {
             return nextLevelPtr[location]->getFrameNumber(logicalAddress);
@@ -99,14 +101,14 @@ int Level::sizeTotal() {
     int basicSize = sizeof(depth) + sizeof(isLeafLevel) + sizeof(pageTablePtr);
     basicSize += sizeof(nextLevelPtr) + sizeof(mapPtr);
     int subSize = 0;
-    if(isLeafLevel){
-        if(mapPtr == NULL){
+    if (isLeafLevel) {
+        if (mapPtr == NULL) {
             return basicSize;
         }
         return basicSize + mapPtr->sizeTotal();
     }
     for (int i = 0; i < pageTablePtr->entryCountArray[depth]; i++) {
-        if(nextLevelPtr[i] != NULL){
+        if (nextLevelPtr[i] != NULL) {
             subSize += nextLevelPtr[i]->sizeTotal();
         }
     }
