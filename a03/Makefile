@@ -1,4 +1,4 @@
-CC = g++
+CC = g++ -std=c++11
 DATA_STRUCTURES = page_table.o level.o map.o
 BYU = byu.o
 
