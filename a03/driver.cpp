@@ -4,7 +4,6 @@
 #define HIT 0
 #define MISS 1
 #define FILE_OPEN_ERROR 2
-#define GET_NEXT_TRACE_ERROR 3
 
 #include "unistd.h"
 #include "byutr.h"
@@ -78,7 +77,6 @@ int main(int argc, char *argv[]){
             break;
         }
     }
-    free(filePointer);
     cout << hits << " " << misses << " " << pagetable.sizeTotal() << endl;
 
     return 0;
