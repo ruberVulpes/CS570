@@ -11,8 +11,6 @@
 #include "page_table.h"
 #include "map.h"
 
-#define nullptr 0
-
 class PAGETABLE;
 class Level{
 private:

@@ -8,7 +8,6 @@
 #include "level.h"
 #define ADDRESS_SIZE 32
 #define SELF_DEPTH 0
-#define nullptr 0
 
 class  Level;
 class PAGETABLE {
