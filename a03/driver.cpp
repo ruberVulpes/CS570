@@ -15,10 +15,20 @@
 #include <sstream>
 #include <iostream>
 #include <iomanip>
+
 using namespace std;
-int pageInsert(PAGETABLE * pt, unsigned int logicalAddr, unsigned int frame);
+
+int pageInsert(PAGETABLE *pt, unsigned int logicalAddr, unsigned int frame);
+
 void printHelper(int size, int hits, int missess, int pageSize);
-int main(int argc, char *argv[]){
+
+int getFrame(PAGETABLE *pt, unsigned int logicalAddr);
+
+int getPhysicalAddr(PAGETABLE *pt, unsigned int logicalAddr);
+
+void tFlagPrint(PAGETABLE *pt, unsigned int logicalAddress);
+
+int main(int argc, char *argv[]) {
     int argumentCount = 1;
     int nFlag = 0;
     int tFlag = 0;
@@ -58,21 +68,25 @@ int main(int argc, char *argv[]){
         pageTableSizes[i] = atoi(argv[argumentCount++]);
     }
     PAGETABLE pagetable(levelCount, pageTableSizes);
-    if((filePointer = fopen(inputFileName.c_str(), "rb"))== NULL){
+    if ((filePointer = fopen(inputFileName.c_str(), "rb")) == NULL) {
         fprintf(stderr, "Can not open file for reading\n");
         exit(FILE_OPEN_ERROR);
     }
-    while(!feof(filePointer)){
-        if(NextAddress(filePointer, &currentTrace)){
-            if(pageInsert(&pagetable, currentTrace.addr, misses)){
+    while (!feof(filePointer)) {
+        if (NextAddress(filePointer, &currentTrace)) {
+            if (pageInsert(&pagetable, currentTrace.addr, misses)) {
                 misses++;
+
             } else {
                 hits++;
+            }
+            if (tFlag) {
+                tFlagPrint(&pagetable, (unsigned int)currentTrace.addr);
             }
         } else {
             break;
         }
-        if(traceLimit <= hits + misses && nFlag == 1){
+        if (traceLimit <= hits + misses && nFlag == 1) {
             break;
         }
     }
@@ -80,19 +94,39 @@ int main(int argc, char *argv[]){
     int pageSize = pagetable.entryCountArray[levelCount];
     printHelper(pagetable.sizeTotal(), hits, misses, pageSize);
 }
-int pageInsert(PAGETABLE * pt, unsigned int logicalAddr, unsigned int frame){
-    if(pt->insert(logicalAddr, frame)){
+
+int pageInsert(PAGETABLE *pt, unsigned int logicalAddr, unsigned int frame) {
+    if (pt->insert(logicalAddr, frame)) {
         return MISS;
     } else {
         return HIT;
     }
 }
 
-void printHelper(int size, int hits, int missess, int pageSize){
+int getFrame(PAGETABLE *pt, unsigned int logicalAddr) {
+    return pt->getFrameNumber(logicalAddr);
+}
+
+int getPhysicalAddr(PAGETABLE *pt, unsigned int logicalAddr) {
+    int frameNumber = getFrame(pt, logicalAddr);
+    //Frame Number * Page Size
+    int startingLocation = frameNumber * pt->entryCountArray[pt->levelCount];
+    int bitmask = pt->levelBitmaskArray[pt->levelCount];
+    int offset = logicalAddr & bitmask;
+    return startingLocation + offset;
+}
+
+void printHelper(int size, int hits, int missess, int pageSize) {
     double total = hits + missess;
     cout << "Page table size: " << pageSize << endl;
-    cout <<  setprecision(4) << "Hits " << hits << " (" << hits/total * 100;
-    cout << "%), Misses " << missess << " (" << missess/total * 100 << "%) ";
+    cout << setprecision(4) << "Hits " << hits << " (" << hits / total * 100;
+    cout << "%), Misses " << missess << " (" << missess / total * 100 << "%) ";
     cout << setprecision(100) << "# Addressess " << total << endl;
     cout << "Bytes used: " << size << endl;
 }
+
+void tFlagPrint(PAGETABLE *pt, unsigned int logicalAddress) {
+    int physicalAddress = getPhysicalAddr(pt, logicalAddress);
+    printf("%08X -> %08X\n", logicalAddress, physicalAddress);
+}
+
