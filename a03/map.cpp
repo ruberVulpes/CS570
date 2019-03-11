@@ -28,7 +28,7 @@ bool MAP::insertPageNumber(int pageNumber, int frameNumber) {
     return SUCCESS;
 }
 
-unsigned int MAP::invalidatePageNumber(int pageNumber) {
+int MAP::invalidatePageNumber(int pageNumber) {
     int currentFrameNumber = frameMapping[pageNumber];
     frameMapping[pageNumber] = INVALID;
     return currentFrameNumber;

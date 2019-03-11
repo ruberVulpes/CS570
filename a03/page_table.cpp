@@ -11,21 +11,23 @@ PAGETABLE::PAGETABLE(unsigned int levelCount, int *bitsPerLevel) {
     entryCountArray = new unsigned int[PAGETABLE::levelCount + 1];
     rootNodePtr = nullptr;
 
-    int offset = ADDRESS_SIZE;
+    unsigned int offset = ADDRESS_SIZE;
     for (int i = 0; i < PAGETABLE::levelCount; i++) {
         offset -= bitsPerLevel[i];
     }
     int bitsForLevel;
-    int cumulativeBitCount = offset;
-    levelBitmaskArray[levelCount] = ((1 << offset) - 1);
+    unsigned int cumulativeBitCount = offset;
+    unsigned int bitMask;
+    levelBitmaskArray[levelCount] = (unsigned int)((1 << offset) - 1);
     levelShiftArray[levelCount] = 0;
-    entryCountArray[levelCount] = 1 << offset;
+    entryCountArray[levelCount] = (unsigned int)(1 << offset);
     for (int i = PAGETABLE::levelCount - 1; i >= 0; i--) {
         bitsForLevel = bitsPerLevel[i];
         // Equivalent to 2 to the power of bitsForLevel
-        levelBitmaskArray[i] = ((1 << bitsForLevel) - 1) << cumulativeBitCount;
+        bitMask = (unsigned int) (1 << bitsForLevel) - 1;
+        levelBitmaskArray[i] = bitMask << cumulativeBitCount;
         levelShiftArray[i] = cumulativeBitCount;
-        entryCountArray[i] = 1 << bitsForLevel;
+        entryCountArray[i] = (unsigned int) 1 << bitsForLevel;
         cumulativeBitCount += bitsForLevel;
     }
 };

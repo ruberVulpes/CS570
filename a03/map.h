@@ -22,7 +22,7 @@ public:
 
     bool insertPageNumber(int pageNumber, int frameNumber);
 
-    unsigned int invalidatePageNumber(int pageNumber);
+    int invalidatePageNumber(int pageNumber);
 
     bool invalidateFrameNumber(int frameNumber);
 

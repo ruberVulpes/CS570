@@ -54,9 +54,9 @@ MAP *Level::getMap(int) {
 }
 
 bool Level::insert(unsigned int logicalAddress, unsigned int frameNumber) {
-    unsigned int bitmask = pageTablePtr->levelBitmaskArray[depth];
+    unsigned int bitMask = pageTablePtr->levelBitmaskArray[depth];
     unsigned int shift = pageTablePtr->levelShiftArray[depth];
-    unsigned int location = (logicalAddress & bitmask) >> shift;
+    unsigned int location = (logicalAddress & bitMask) >> shift;
 
     if (isLeafLevel) {
         if (mapPtr == nullptr) {
@@ -73,9 +73,9 @@ bool Level::insert(unsigned int logicalAddress, unsigned int frameNumber) {
 }
 
 int Level::getFrameNumber(unsigned int logicalAddress) {
-    unsigned int bitmask = pageTablePtr->levelBitmaskArray[depth];
+    unsigned int bitMask = pageTablePtr->levelBitmaskArray[depth];
     unsigned int shift = pageTablePtr->levelShiftArray[depth];
-    unsigned int location = (logicalAddress & bitmask) >> shift;
+    unsigned int location = (logicalAddress & bitMask) >> shift;
     if (isLeafLevel) {
         if (mapPtr == nullptr) {
             return INVALID;
@@ -96,13 +96,10 @@ int Level::sizeTotal() {
     basicSize += sizeof(nextLevelPtr) + sizeof(mapPtr);
     int subSize = 0;
     if (isLeafLevel) {
-        if (mapPtr == NULL) {
-            return basicSize;
-        }
-        return basicSize + mapPtr->sizeTotal();
+        return mapPtr == nullptr ? basicSize : basicSize + mapPtr->sizeTotal();
     }
     for (int i = 0; i < pageTablePtr->entryCountArray[depth]; i++) {
-        if (nextLevelPtr[i] != NULL) {
+        if (nextLevelPtr[i] != nullptr) {
             subSize += nextLevelPtr[i]->sizeTotal();
         }
     }

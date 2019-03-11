@@ -4,6 +4,7 @@
 #define HIT 0
 #define MISS 1
 #define FILE_OPEN_ERROR 2
+#define ADDRESS_SIZE_ERROR 3
 
 #include "unistd.h"
 #include "byutr.h"
@@ -18,23 +19,30 @@
 
 using namespace std;
 
-int pageInsert(PAGETABLE *pt, unsigned int logicalAddr, unsigned int frame);
+//Inserts into Page Table, returns Hit/Miss
+int pageInsert(PAGETABLE *pagetable, unsigned int logicalAddr, unsigned int frame);
 
-void printHelper(int size, int hits, int missess, int pageSize);
+//Helper for output statistics printing
+void printHelper(int size, int hits, int missess, unsigned int pageSize);
 
-int getFrame(PAGETABLE *pt, unsigned int logicalAddr);
+//Returns frame number for the specified logical address
+int getFrame(PAGETABLE *pagetable, unsigned int logicalAddr);
 
-int getPhysicalAddr(PAGETABLE *pt, unsigned int logicalAddr);
+//Returns physical address for specified logical address
+int getPhysicalAddr(PAGETABLE *pagetable, unsigned int logicalAddr);
 
-void tFlagPrint(PAGETABLE *pt, unsigned int logicalAddress);
+//Helps handle tFlag case, prints Logical -> Physical
+void tFlagHelper(PAGETABLE *pagetable, unsigned int logicalAddress, bool tFlag);
 
-void fFlagOutput(PAGETABLE *pt, string fileName, int addressSizeUsed);
+//Helps handle pFlag case, outputs all Page Number -> Frame Number
+void pFlagHelper(PAGETABLE *pt, string file, int addressSizeUsed, bool pFlag);
 
 int main(int argc, char *argv[]) {
+    //argv[0] is pagetable so argc will always start at 1
     int argumentCount = 1;
-    int nFlag = 0;
-    int tFlag = 0;
-    int fFlag = 0;
+    bool nFlag = false;
+    bool tFlag = false;
+    bool pFlag = false;
     string inputFileName;
     string outputFileName;
 
@@ -45,20 +53,20 @@ int main(int argc, char *argv[]) {
     unsigned int hits = 0;
     unsigned int misses = 0;
     int option = 0;
-    while ((option = getopt(argc, argv, "n:f:t")) != -1) {
+    while ((option = getopt(argc, argv, "n:p:t")) != -1) {
         switch (option) {
             case 'n' :
-                nFlag = 1;
+                nFlag = true;
                 traceLimit = atoi(optarg);
                 argumentCount += 2;
                 break;
-            case 'f' :
-                fFlag = 1;
+            case 'p' :
+                pFlag = true;
                 outputFileName = string(optarg);
                 argumentCount += 2;
                 break;
             case 't' :
-                tFlag = 1;
+                tFlag = true;
                 argumentCount++;
                 break;
             default:
@@ -73,9 +81,16 @@ int main(int argc, char *argv[]) {
         pageTableSizes[i] = atoi(argv[argumentCount++]);
         addressSizeUsed += pageTableSizes[i];
     }
-    //TODO:: Check Address Size
+    //Inputed address validation
+    if (addressSizeUsed > ADDRESS_SIZE) {
+        fprintf(stderr, "Page Level Size(s) Exceed 32bit Address Size");
+        exit(ADDRESS_SIZE_ERROR);
+    } else if (addressSizeUsed == 0) {
+        fprintf(stderr, "Please specify Page Level Size(s)");
+        exit(ADDRESS_SIZE_ERROR);
+    }
     PAGETABLE pagetable(levelCount, pageTableSizes);
-    if ((filePointer = fopen(inputFileName.c_str(), "rb")) == NULL) {
+    if ((filePointer = fopen(inputFileName.c_str(), "rb")) == nullptr) {
         fprintf(stderr, "Can not open %s for reading\n", inputFileName.c_str());
         exit(FILE_OPEN_ERROR);
     }
@@ -83,50 +98,47 @@ int main(int argc, char *argv[]) {
         if (NextAddress(filePointer, &currentTrace)) {
             if (pageInsert(&pagetable, currentTrace.addr, misses)) {
                 misses++;
-
             } else {
                 hits++;
             }
-            if (tFlag) {
-                tFlagPrint(&pagetable, (unsigned int) currentTrace.addr);
-            }
-        } else {
-            break;
+            tFlagHelper(&pagetable, (unsigned int) currentTrace.addr, tFlag);
         }
-        if (traceLimit <= hits + misses && nFlag == 1) {
+        //End if nFlag limit is hit (misses + hits = addressesProcessed)
+        if (traceLimit <= hits + misses && nFlag) {
             break;
         }
     }
     fclose(filePointer);
-    if (fFlag) {
-        fFlagOutput(&pagetable, outputFileName, addressSizeUsed);
-    }
-    int pageSize = pagetable.entryCountArray[levelCount];
+
+    pFlagHelper(&pagetable, outputFileName, addressSizeUsed, pFlag);
+
+    unsigned pageSize = pagetable.entryCountArray[levelCount];
     printHelper(pagetable.sizeTotal(), hits, misses, pageSize);
 }
 
-int pageInsert(PAGETABLE *pt, unsigned int logicalAddr, unsigned int frame) {
-    if (pt->insert(logicalAddr, frame)) {
+int pageInsert(PAGETABLE *pagetable, unsigned int logicalAddr, unsigned int frame) {
+    if (pagetable->insert(logicalAddr, frame)) {
         return MISS;
     } else {
         return HIT;
     }
 }
 
-int getFrame(PAGETABLE *pt, unsigned int logicalAddr) {
-    return pt->getFrameNumber(logicalAddr);
+int getFrame(PAGETABLE *pagetable, unsigned int logicalAddr) {
+    return pagetable->getFrameNumber(logicalAddr);
 }
 
-int getPhysicalAddr(PAGETABLE *pt, unsigned int logicalAddr) {
-    int frameNumber = getFrame(pt, logicalAddr);
-    //Frame Number * Page Size
-    int startingLocation = frameNumber * pt->entryCountArray[pt->levelCount];
-    int bitmask = pt->levelBitmaskArray[pt->levelCount];
-    int offset = logicalAddr & bitmask;
-    return startingLocation + offset;
+int getPhysicalAddr(PAGETABLE *pagetable, unsigned int logicalAddr) {
+    int frameNumber = getFrame(pagetable, logicalAddr);
+    int pageSize = pagetable->entryCountArray[pagetable->levelCount];
+    int startingPhysicalLocation = frameNumber * pageSize;
+    int bitMask = pagetable->levelBitmaskArray[pagetable->levelCount];
+    int offset = logicalAddr & bitMask;
+    return startingPhysicalLocation + offset;
 }
 
-void printHelper(int size, int hits, int missess, int pageSize) {
+//Formats end of run output statistics
+void printHelper(int size, int hits, int missess, unsigned int pageSize) {
     double total = hits + missess;
     cout << "Page table size: " << pageSize << endl;
     cout << setprecision(4) << "Hits " << hits << " (" << hits / total * 100;
@@ -135,38 +147,44 @@ void printHelper(int size, int hits, int missess, int pageSize) {
     cout << "Bytes used: " << size << endl;
 }
 
-void tFlagPrint(PAGETABLE *pt, unsigned int logicalAddress) {
-    int physicalAddress = getPhysicalAddr(pt, logicalAddress);
-    printf("%08X -> %08X\n", logicalAddress, physicalAddress);
+void tFlagHelper(PAGETABLE *pagetable, unsigned int logicalAddress, bool tFlag) {
+    if (tFlag) {
+        int physicalAddress = getPhysicalAddr(pagetable, logicalAddress);
+        printf("%08X -> %08X\n", logicalAddress, physicalAddress);
+    }
 }
 
-void fFlagOutput(PAGETABLE *pt, string fileName, int addressSizeUsed) {
-    FILE *filePointer;
-    if ((filePointer = fopen(fileName.c_str(), "w")) == nullptr) {
-        fprintf(stderr, "Can not open %s for writing\n", fileName.c_str());
-        exit(FILE_OPEN_ERROR);
-    }
-    int maxPageTableSize = 1 << addressSizeUsed;
-    //Initialize bool flag array to 0
-    bool *framesOutputed = new bool[maxPageTableSize];
-    for (int i = 0; i < maxPageTableSize; i++) {
-        framesOutputed[i] = false;
-    }
-    int offset = pt->levelShiftArray[pt->levelCount - 1];
-    int frameNumber;
-    int pageNumber;
-    for (int i = 0; i < maxPageTableSize; i++) {
-        pageNumber = i << offset;
-        frameNumber = pt->getFrameNumber(pageNumber);
-        if (frameNumber != INVALID) {
-            if (!framesOutputed[frameNumber]) {
-                fprintf(filePointer, "%08X -> %08X\n", i, frameNumber);
-                framesOutputed[frameNumber] = true;
-            }
+void pFlagHelper(PAGETABLE *pt, string file, int addressSizeUsed, bool pFlag) {
+    if (pFlag) {
+        FILE *filePointer;
+        if ((filePointer = fopen(file.c_str(), "w")) == nullptr) {
+            fprintf(stderr, "Can not open %s for writing\n", file.c_str());
+            exit(FILE_OPEN_ERROR);
         }
+        // 1 << adressSizeUsed is equivalent to 2^(# bits not in offset)
+        int maxPageNumber = 1 << addressSizeUsed;
+        //Initialize all bool flags in array to 0
+        bool *frameNumberOutputed = new bool[maxPageNumber];
+        for (int i = 0; i < maxPageNumber; i++) {
+            frameNumberOutputed[i] = false;
+        }
+        int offset = pt->levelShiftArray[pt->levelCount - 1];
+        int frameNumber;
+        int pageNumber;
+        for (int i = 0; i < maxPageNumber; i++) {
+            //Converts a Page Number to a Logical Address w/ offset = 0
+            pageNumber = i << offset;
+            frameNumber = pt->getFrameNumber(pageNumber);
+            //Only print valid frames once
+            if (frameNumber != INVALID) {
+                if (!frameNumberOutputed[frameNumber]) {
+                    fprintf(filePointer, "%08X -> %08X\n", i, frameNumber);
+                    frameNumberOutputed[frameNumber] = true;
+                }
+            }
 
+        }
+        delete[] frameNumberOutputed;
+        fclose(filePointer);
     }
-    delete[] framesOutputed;
-    fclose(filePointer);
-
 }
