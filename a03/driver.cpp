@@ -27,11 +27,13 @@ int getFrame(PAGETABLE *pt, unsigned int logicalAddr);
 int getPhysicalAddr(PAGETABLE *pt, unsigned int logicalAddr);
 
 void tFlagPrint(PAGETABLE *pt, unsigned int logicalAddress);
+void fFlagOutput(PAGETABLE *pt, string fileName, int addressSizeUsed);
 
 int main(int argc, char *argv[]) {
     int argumentCount = 1;
     int nFlag = 0;
     int tFlag = 0;
+    int fFlag = 0;
     string inputFileName;
     string outputFileName;
 
@@ -50,6 +52,7 @@ int main(int argc, char *argv[]) {
                 argumentCount += 2;
                 break;
             case 'f' :
+                fFlag = 1;
                 outputFileName = string(optarg);
                 argumentCount += 2;
                 break;
@@ -64,12 +67,15 @@ int main(int argc, char *argv[]) {
     inputFileName = argv[argumentCount++];
     int levelCount = argc - argumentCount;
     int pageTableSizes[levelCount];
+    int addressSizeUsed = 0;
     for (int i = 0; argumentCount < argc; i++) {
         pageTableSizes[i] = atoi(argv[argumentCount++]);
+        addressSizeUsed += pageTableSizes[i];
     }
+    //TODO:: Check Address Size
     PAGETABLE pagetable(levelCount, pageTableSizes);
     if ((filePointer = fopen(inputFileName.c_str(), "rb")) == NULL) {
-        fprintf(stderr, "Can not open file for reading\n");
+        fprintf(stderr, "Can not open %s for reading\n", inputFileName.c_str());
         exit(FILE_OPEN_ERROR);
     }
     while (!feof(filePointer)) {
@@ -91,6 +97,9 @@ int main(int argc, char *argv[]) {
         }
     }
     fclose(filePointer);
+    if(fFlag){
+        fFlagOutput(&pagetable, outputFileName, addressSizeUsed);
+    }
     int pageSize = pagetable.entryCountArray[levelCount];
     printHelper(pagetable.sizeTotal(), hits, misses, pageSize);
 }
@@ -130,3 +139,33 @@ void tFlagPrint(PAGETABLE *pt, unsigned int logicalAddress) {
     printf("%08X -> %08X\n", logicalAddress, physicalAddress);
 }
 
+void fFlagOutput(PAGETABLE *pt, string fileName, int addressSizeUsed){
+    FILE *filePointer;
+    if ((filePointer = fopen(fileName.c_str(), "w")) == nullptr) {
+        fprintf(stderr, "Can not open %s for writing\n", fileName.c_str());
+        exit(FILE_OPEN_ERROR);
+    }
+    int maxPageTableSize = 1 << addressSizeUsed;
+    //Initialize bool flag array to 0
+    bool *framesOutputed = new bool[maxPageTableSize];
+    for(int i = 0; i < maxPageTableSize; i++){
+        framesOutputed[i] = false;
+    }
+    int offset = pt->levelShiftArray[pt->levelCount - 1];
+    int frameNumber;
+    int pageNumber;
+    for(int i = 0; i < maxPageTableSize; i++){
+        pageNumber = i << offset;
+        frameNumber = pt->getFrameNumber(pageNumber);
+        if(frameNumber != INVALID){
+            if(!framesOutputed[frameNumber]) {
+                fprintf(filePointer, "%08X -> %08X\n", i, frameNumber);
+                framesOutputed[frameNumber] = true;
+            }
+        }
+
+    }
+    delete[] framesOutputed;
+    fclose(filePointer);
+
+}

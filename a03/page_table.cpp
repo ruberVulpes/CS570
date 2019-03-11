@@ -39,7 +39,7 @@ PAGETABLE::~PAGETABLE() {
 
 bool PAGETABLE::insert(unsigned int logicalAddress, unsigned int frameNumber){
     if(rootNodePtr == nullptr){
-        rootNodePtr = new Level(0, 0 == levelCount, this);
+        rootNodePtr = new Level(0, 1 == levelCount, this);
     }
     return rootNodePtr->insert(logicalAddress, frameNumber);
 }
