@@ -29,7 +29,7 @@ public:
 
     int sizeTotal();
 
-//private:
+private:
     Level *rootNodePtr;
 };
 
