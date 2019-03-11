@@ -32,7 +32,7 @@ int getFrame(PAGETABLE *pagetable, unsigned int logicalAddr);
 int getPhysicalAddr(PAGETABLE *pagetable, unsigned int logicalAddr);
 
 //Helps handle tFlag case, prints Logical -> Physical
-void tFlagHelper(PAGETABLE *pagetable, unsigned int logicalAddress, bool tFlag);
+void tFlagHelper(PAGETABLE *pt, unsigned int logicalAddress, FILE *filePointer);
 
 //Helps handle pFlag case, outputs all Page Number -> Frame Number
 void pFlagHelper(PAGETABLE *pt, string file, int addressSizeUsed, bool pFlag);
@@ -44,7 +44,8 @@ int main(int argc, char *argv[]) {
     bool tFlag = false;
     bool pFlag = false;
     string inputFileName;
-    string outputFileName;
+    string pFlagFile;
+    string tFlagFile;
 
     FILE *filePointer;
     int traceLimit = 0;
@@ -53,7 +54,7 @@ int main(int argc, char *argv[]) {
     unsigned int hits = 0;
     unsigned int misses = 0;
     int option = 0;
-    while ((option = getopt(argc, argv, "n:p:t")) != -1) {
+    while ((option = getopt(argc, argv, "n:p:t:")) != -1) {
         switch (option) {
             case 'n' :
                 nFlag = true;
@@ -62,12 +63,13 @@ int main(int argc, char *argv[]) {
                 break;
             case 'p' :
                 pFlag = true;
-                outputFileName = string(optarg);
+                pFlagFile = string(optarg);
                 argumentCount += 2;
                 break;
             case 't' :
                 tFlag = true;
-                argumentCount++;
+                tFlagFile = string(optarg);
+                argumentCount+=2;
                 break;
             default:
                 break;
@@ -94,6 +96,13 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Can not open %s for reading\n", inputFileName.c_str());
         exit(FILE_OPEN_ERROR);
     }
+    FILE *tFlagFilePointer;
+    if(tFlag){
+        if ((tFlagFilePointer = fopen(tFlagFile.c_str(), "w")) == nullptr) {
+            fprintf(stderr, "Can not open %s for writing\n", tFlagFile.c_str());
+            exit(FILE_OPEN_ERROR);
+        }
+    }
     while (!feof(filePointer)) {
         if (NextAddress(filePointer, &currentTrace)) {
             if (pageInsert(&pagetable, currentTrace.addr, misses)) {
@@ -101,16 +110,19 @@ int main(int argc, char *argv[]) {
             } else {
                 hits++;
             }
-            tFlagHelper(&pagetable, (unsigned int) currentTrace.addr, tFlag);
+        }
+        if(tFlag) {
+            tFlagHelper(&pagetable, currentTrace.addr, tFlagFilePointer);
         }
         //End if nFlag limit is hit (misses + hits = addressesProcessed)
         if (traceLimit <= hits + misses && nFlag) {
             break;
         }
     }
+    fclose(tFlagFilePointer);
     fclose(filePointer);
 
-    pFlagHelper(&pagetable, outputFileName, addressSizeUsed, pFlag);
+    pFlagHelper(&pagetable, pFlagFile, addressSizeUsed, pFlag);
 
     unsigned pageSize = pagetable.entryCountArray[levelCount];
     printHelper(pagetable.sizeTotal(), hits, misses, pageSize);
@@ -147,11 +159,10 @@ void printHelper(int size, int hits, int missess, unsigned int pageSize) {
     cout << "Bytes used: " << size << endl;
 }
 
-void tFlagHelper(PAGETABLE *pagetable, unsigned int logicalAddress, bool tFlag) {
-    if (tFlag) {
-        int physicalAddress = getPhysicalAddr(pagetable, logicalAddress);
-        printf("%08X -> %08X\n", logicalAddress, physicalAddress);
-    }
+void tFlagHelper(PAGETABLE *pt, unsigned int logicalAddress, FILE *filePointer) {
+        int physicalAddress = getPhysicalAddr(pt, logicalAddress);
+        fprintf(filePointer, "%08X -> %08X\n", logicalAddress, physicalAddress);
+
 }
 
 void pFlagHelper(PAGETABLE *pt, string file, int addressSizeUsed, bool pFlag) {
