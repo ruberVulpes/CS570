@@ -37,15 +37,15 @@ PAGETABLE::~PAGETABLE() {
     delete rootNodePtr;
 }
 
-bool PAGETABLE::insert(unsigned int logicalAddress, unsigned int frameNumber){
-    if(rootNodePtr == nullptr){
+bool PAGETABLE::insert(unsigned int logicalAddress, unsigned int frameNumber) {
+    if (rootNodePtr == nullptr) {
         rootNodePtr = new Level(0, 1 == levelCount, this);
     }
     return rootNodePtr->insert(logicalAddress, frameNumber);
 }
 
 int PAGETABLE::getFrameNumber(unsigned int logicalAddress) {
-    if(rootNodePtr == nullptr){
+    if (rootNodePtr == nullptr) {
         return INVALID;
     }
     return rootNodePtr->getFrameNumber(logicalAddress);
@@ -56,7 +56,7 @@ int PAGETABLE::sizeTotal() {
     basicSize += sizeof(entryCountArray);
     basicSize *= levelCount;
     basicSize += sizeof(levelCount) + sizeof(rootNodePtr);
-    if(rootNodePtr == nullptr){
+    if (rootNodePtr == nullptr) {
         return basicSize;
     }
     return basicSize + rootNodePtr->sizeTotal();

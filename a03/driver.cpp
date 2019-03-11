@@ -27,6 +27,7 @@ int getFrame(PAGETABLE *pt, unsigned int logicalAddr);
 int getPhysicalAddr(PAGETABLE *pt, unsigned int logicalAddr);
 
 void tFlagPrint(PAGETABLE *pt, unsigned int logicalAddress);
+
 void fFlagOutput(PAGETABLE *pt, string fileName, int addressSizeUsed);
 
 int main(int argc, char *argv[]) {
@@ -87,7 +88,7 @@ int main(int argc, char *argv[]) {
                 hits++;
             }
             if (tFlag) {
-                tFlagPrint(&pagetable, (unsigned int)currentTrace.addr);
+                tFlagPrint(&pagetable, (unsigned int) currentTrace.addr);
             }
         } else {
             break;
@@ -97,7 +98,7 @@ int main(int argc, char *argv[]) {
         }
     }
     fclose(filePointer);
-    if(fFlag){
+    if (fFlag) {
         fFlagOutput(&pagetable, outputFileName, addressSizeUsed);
     }
     int pageSize = pagetable.entryCountArray[levelCount];
@@ -139,7 +140,7 @@ void tFlagPrint(PAGETABLE *pt, unsigned int logicalAddress) {
     printf("%08X -> %08X\n", logicalAddress, physicalAddress);
 }
 
-void fFlagOutput(PAGETABLE *pt, string fileName, int addressSizeUsed){
+void fFlagOutput(PAGETABLE *pt, string fileName, int addressSizeUsed) {
     FILE *filePointer;
     if ((filePointer = fopen(fileName.c_str(), "w")) == nullptr) {
         fprintf(stderr, "Can not open %s for writing\n", fileName.c_str());
@@ -148,17 +149,17 @@ void fFlagOutput(PAGETABLE *pt, string fileName, int addressSizeUsed){
     int maxPageTableSize = 1 << addressSizeUsed;
     //Initialize bool flag array to 0
     bool *framesOutputed = new bool[maxPageTableSize];
-    for(int i = 0; i < maxPageTableSize; i++){
+    for (int i = 0; i < maxPageTableSize; i++) {
         framesOutputed[i] = false;
     }
     int offset = pt->levelShiftArray[pt->levelCount - 1];
     int frameNumber;
     int pageNumber;
-    for(int i = 0; i < maxPageTableSize; i++){
+    for (int i = 0; i < maxPageTableSize; i++) {
         pageNumber = i << offset;
         frameNumber = pt->getFrameNumber(pageNumber);
-        if(frameNumber != INVALID){
-            if(!framesOutputed[frameNumber]) {
+        if (frameNumber != INVALID) {
+            if (!framesOutputed[frameNumber]) {
                 fprintf(filePointer, "%08X -> %08X\n", i, frameNumber);
                 framesOutputed[frameNumber] = true;
             }

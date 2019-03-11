@@ -7,7 +7,7 @@
 MAP::MAP(int size) {
     MAP::size = size;
     MAP::frameMapping = new int[size];
-    for(int i = 0; i < size; i++){
+    for (int i = 0; i < size; i++) {
         frameMapping[i] = INVALID;
     }
 }
@@ -21,7 +21,7 @@ int MAP::getFrameNumber(int pageNumber) {
 }
 
 bool MAP::insertPageNumber(int pageNumber, int frameNumber) {
-    if(frameMapping[pageNumber] != INVALID){
+    if (frameMapping[pageNumber] != INVALID) {
         return FAILURE;
     }
     frameMapping[pageNumber] = frameNumber;
@@ -35,8 +35,8 @@ unsigned int MAP::invalidatePageNumber(int pageNumber) {
 }
 
 bool MAP::invalidateFrameNumber(int frameNumber) {
-    for(int i = 0; i < size; i++){
-        if(frameMapping[i] == frameNumber){
+    for (int i = 0; i < size; i++) {
+        if (frameMapping[i] == frameNumber) {
             frameMapping[i] = INVALID;
             return SUCCESS;
         }

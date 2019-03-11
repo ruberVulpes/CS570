@@ -6,10 +6,12 @@
 #define CS570_PAGE_TABLE_H
 
 #include "level.h"
+
 #define ADDRESS_SIZE 32
 #define SELF_DEPTH 0
 
-class  Level;
+class Level;
+
 class PAGETABLE {
 public:
     unsigned int levelCount;
@@ -17,10 +19,14 @@ public:
     unsigned int *levelShiftArray;
     unsigned int *entryCountArray;
 
-    PAGETABLE(unsigned int, int*);
+    PAGETABLE(unsigned int, int *);
+
     ~PAGETABLE();
+
     bool insert(unsigned int, unsigned int);
+
     int getFrameNumber(unsigned int);
+
     int sizeTotal();
 
 //private:

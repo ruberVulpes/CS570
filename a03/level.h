@@ -12,20 +12,27 @@
 #include "map.h"
 
 class PAGETABLE;
-class Level{
+
+class Level {
 private:
     int depth;
     bool isLeafLevel;
-    PAGETABLE * pageTablePtr;
-    Level ** nextLevelPtr;
-    MAP * mapPtr;
+    PAGETABLE *pageTablePtr;
+    Level **nextLevelPtr;
+    MAP *mapPtr;
 public:
-    Level(int, bool, PAGETABLE*);
+    Level(int, bool, PAGETABLE *);
+
     ~Level();
+
     Level *getSubLevel(int);
+
     MAP *getMap(int);
+
     bool insert(unsigned int, unsigned int);
+
     int getFrameNumber(unsigned int);
+
     int sizeTotal();
 
 };

@@ -7,24 +7,22 @@
  * other than an Intel PC or equivalent) the unsigned longs will need
  * to be converted from little-endian to big-endian.
  */
-unsigned long swap_endian(unsigned long num)
-{
-  return(((num << 24) & 0xff000000) | ((num << 8) & 0x00ff0000) | 
-  ((num >> 8) & 0x0000ff00) | ((num >> 24) & 0x000000ff) );
+unsigned long swap_endian(unsigned long num) {
+    return (((num << 24) & 0xff000000) | ((num << 8) & 0x00ff0000) |
+            ((num >> 8) & 0x0000ff00) | ((num >> 24) & 0x000000ff));
 }
 
 /* determine if system is big- or little- endian */
-ENDIAN endian()
-{
-  unsigned long *a;
-  unsigned char p[4];
-  
-  a = (unsigned long *)p;
-  *a = 0x12345678;
-  if(*p == 0x12)
-    return BIG;
-  else
-    return LITTLE;
+ENDIAN endian() {
+    unsigned long *a;
+    unsigned char p[4];
+
+    a = (unsigned long *) p;
+    *a = 0x12345678;
+    if (*p == 0x12)
+        return BIG;
+    else
+        return LITTLE;
 }
 
 /* int NextAddress(FILE *trace_file, p2AddrTr *Addr)
@@ -37,30 +35,30 @@ ENDIAN endian()
  */
 int NextAddress(FILE *trace_file, p2AddrTr *addr_ptr) {
 
-  int readN;	/* number of records stored */ 
-  static ENDIAN byte_order = UNKNOWN;	/* don't know machine format */
+    int readN;    /* number of records stored */
+    static ENDIAN byte_order = UNKNOWN;    /* don't know machine format */
 
-  /* Read the next address record. */
-  readN = fread(addr_ptr, sizeof(p2AddrTr), 1, trace_file);
+    /* Read the next address record. */
+    readN = fread(addr_ptr, sizeof(p2AddrTr), 1, trace_file);
 
-  if (readN) {
-    
-    switch (byte_order) {
-    case LITTLE:
-      break;	/* do nothing */
-    case BIG:
-      /* records stored in little endian format, convert */
-      addr_ptr->addr = swap_endian(addr_ptr->addr);
-      addr_ptr->time = swap_endian(addr_ptr->time);
-      break;
-    case UNKNOWN:
-      /* Find out with what type of machine we are working... */
-      byte_order = endian();
-      break;
+    if (readN) {
+
+        switch (byte_order) {
+            case LITTLE:
+                break;    /* do nothing */
+            case BIG:
+                /* records stored in little endian format, convert */
+                addr_ptr->addr = swap_endian(addr_ptr->addr);
+                addr_ptr->time = swap_endian(addr_ptr->time);
+                break;
+            case UNKNOWN:
+                /* Find out with what type of machine we are working... */
+                byte_order = endian();
+                break;
+        }
     }
-  }
 
-  return readN;    
+    return readN;
 }
 
 /* void AddressDecoder(p2AddrTr *addr_ptr, FILE *out)
@@ -68,70 +66,70 @@ int NextAddress(FILE *trace_file, p2AddrTr *addr_ptr) {
  * file handle (opened by fopen in write mode)
  */
 void AddressDecoder(p2AddrTr *addr_ptr, FILE *out) {
-  
-  fprintf(out, "%08lx ", addr_ptr->addr);	/* address */
-  /* what type of address request */
-  switch (addr_ptr->reqtype) {
-    case FETCH:
-      fprintf(out, "FETCH\t\t");
-      break;
-    case MEMREAD:
-      fprintf(out, "MEMREAD\t");
-      break;
-    case MEMREADINV:
-      fprintf(out, "MEMREADINV\t");
-      break;
-    case MEMWRITE:
-      fprintf(out, "MEMWRITE\t");
-      break;
-    case IOREAD:
-      fprintf(out, "IOREAD\t\t");
-      break;
-    case IOWRITE:
-      fprintf(out, "IOWRITE\t");
-      break;
-    case DEFERREPLY:
-      fprintf(out, "DEFERREPLY\t");
-      break;
-    case INTA:
-      fprintf(out, "INTA\t\t");
-      break;
-    case CNTRLAGNTRES:
-      fprintf(out, "CNTRLAGNTRES\t");
-      break;
-    case BRTRACEREC:
-      fprintf(out, "BRTRACEREC\t");
-      break;
-    case SHUTDOWN:
-      fprintf(out, "SHUTDOWN\t");
-      break;
-    case FLUSH:
-      fprintf(out, "FLUSH\t\t");
-      break;
-    case HALT:
-      fprintf(out, "HALT\t\t");
-      break;
-    case SYNC:
-      fprintf(out, "SYNC\t\t");
-      break;
-    case FLUSHACK:
-      fprintf(out, "FLUSHACK\t");
-      break;
-    case STOPCLKACK:
-      fprintf(out, "STOPCLKAK\t");
-      break;
-    case SMIACK:
-      fprintf(out, "SMIACK\t\t");
-      break;
-  }
-  /* print remaining attributes:
-     bytes accessed
-     other tattributes
-     process
-     timestamp
-  */
-  fprintf(out, "%2d\t%02x\t%1d\t%08lx\n", addr_ptr->size, addr_ptr->attr,
-	  addr_ptr->proc, addr_ptr->time);
+
+    fprintf(out, "%08lx ", addr_ptr->addr);    /* address */
+    /* what type of address request */
+    switch (addr_ptr->reqtype) {
+        case FETCH:
+            fprintf(out, "FETCH\t\t");
+            break;
+        case MEMREAD:
+            fprintf(out, "MEMREAD\t");
+            break;
+        case MEMREADINV:
+            fprintf(out, "MEMREADINV\t");
+            break;
+        case MEMWRITE:
+            fprintf(out, "MEMWRITE\t");
+            break;
+        case IOREAD:
+            fprintf(out, "IOREAD\t\t");
+            break;
+        case IOWRITE:
+            fprintf(out, "IOWRITE\t");
+            break;
+        case DEFERREPLY:
+            fprintf(out, "DEFERREPLY\t");
+            break;
+        case INTA:
+            fprintf(out, "INTA\t\t");
+            break;
+        case CNTRLAGNTRES:
+            fprintf(out, "CNTRLAGNTRES\t");
+            break;
+        case BRTRACEREC:
+            fprintf(out, "BRTRACEREC\t");
+            break;
+        case SHUTDOWN:
+            fprintf(out, "SHUTDOWN\t");
+            break;
+        case FLUSH:
+            fprintf(out, "FLUSH\t\t");
+            break;
+        case HALT:
+            fprintf(out, "HALT\t\t");
+            break;
+        case SYNC:
+            fprintf(out, "SYNC\t\t");
+            break;
+        case FLUSHACK:
+            fprintf(out, "FLUSHACK\t");
+            break;
+        case STOPCLKACK:
+            fprintf(out, "STOPCLKAK\t");
+            break;
+        case SMIACK:
+            fprintf(out, "SMIACK\t\t");
+            break;
+    }
+    /* print remaining attributes:
+       bytes accessed
+       other tattributes
+       process
+       timestamp
+    */
+    fprintf(out, "%2d\t%02x\t%1d\t%08lx\n", addr_ptr->size, addr_ptr->attr,
+            addr_ptr->proc, addr_ptr->time);
 }
 
 

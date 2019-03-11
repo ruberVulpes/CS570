@@ -9,17 +9,23 @@
 #define FAILURE false
 #define SUCCESS true
 
-class MAP{
+class MAP {
 private:
     int size;
     int *frameMapping;
 public:
     MAP(int);
+
     ~MAP();
+
     int getFrameNumber(int pageNumber);
+
     bool insertPageNumber(int pageNumber, int frameNumber);
+
     unsigned int invalidatePageNumber(int pageNumber);
+
     bool invalidateFrameNumber(int frameNumber);
+
     int sizeTotal();
 };
 
