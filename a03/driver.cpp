@@ -119,7 +119,9 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
-    fclose(tFlagFilePointer);
+    if(tFlag){
+        fclose(tFlagFilePointer);
+    }
     fclose(filePointer);
 
     pFlagHelper(&pagetable, pFlagFile, addressSizeUsed, pFlag);
