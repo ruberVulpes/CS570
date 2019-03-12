@@ -33,9 +33,9 @@ PAGETABLE::PAGETABLE(unsigned int levelCount, int *bitsPerLevel) {
 };
 
 PAGETABLE::~PAGETABLE() {
-    delete levelBitmaskArray;
-    delete levelShiftArray;
-    delete entryCountArray;
+    delete[] levelBitmaskArray;
+    delete[] levelShiftArray;
+    delete[] entryCountArray;
     delete rootNodePtr;
 }
 
