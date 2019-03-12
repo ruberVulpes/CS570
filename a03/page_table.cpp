@@ -6,8 +6,8 @@
 
 PAGETABLE::PAGETABLE(unsigned int levelCount, int *bitsPerLevel) {
     PAGETABLE::levelCount = levelCount;
-    levelBitmaskArray = new unsigned int[PAGETABLE::levelCount];
-    levelShiftArray = new unsigned int[PAGETABLE::levelCount];
+    levelBitmaskArray = new unsigned int[PAGETABLE::levelCount + 1];
+    levelShiftArray = new unsigned int[PAGETABLE::levelCount + 1];
     entryCountArray = new unsigned int[PAGETABLE::levelCount + 1];
     rootNodePtr = nullptr;
 
@@ -33,9 +33,9 @@ PAGETABLE::PAGETABLE(unsigned int levelCount, int *bitsPerLevel) {
 };
 
 PAGETABLE::~PAGETABLE() {
-    delete levelBitmaskArray;
-    delete levelShiftArray;
-    delete entryCountArray;
+    delete[] levelBitmaskArray;
+    delete[] levelShiftArray;
+    delete[] entryCountArray;
     delete rootNodePtr;
 }
 
