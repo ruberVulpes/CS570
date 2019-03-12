@@ -83,10 +83,10 @@ int main(int argc, char *argv[]) {
     }
     //Inputed address validation
     if (addressSizeUsed > ADDRESS_SIZE) {
-        fprintf(stderr, "Page Level Size(s) Exceed 32bit Address Size");
+        fprintf(stderr, "Page Level Size(s) Exceed 32bit Address Size\n");
         exit(ADDRESS_SIZE_ERROR);
     } else if (addressSizeUsed == 0) {
-        fprintf(stderr, "Please specify Page Level Size(s)");
+        fprintf(stderr, "Please specify Page Level Size(s)\n");
         exit(ADDRESS_SIZE_ERROR);
     }
     PAGETABLE pagetable(levelCount, pageTableSizes);
