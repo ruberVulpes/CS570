@@ -20,7 +20,7 @@
 using namespace std;
 
 //Inserts into Page Table, returns Hit/Miss
-int pageInsert(PAGETABLE *pagetable, unsigned int logicalAddr, unsigned int frame);
+int pageInsert(PAGETABLE *pt, unsigned int logicalAddr, unsigned int frame);
 
 //Helper for output statistics printing
 void printHelper(int size, int hits, int missess, unsigned int pageSize);
@@ -29,10 +29,10 @@ void printHelper(int size, int hits, int missess, unsigned int pageSize);
 int getFrame(PAGETABLE *pagetable, unsigned int logicalAddr);
 
 //Returns physical address for specified logical address
-int getPhysicalAddr(PAGETABLE *pagetable, unsigned int logicalAddr);
+int getPhysicalAddr(PAGETABLE *pt, unsigned int logicalAddr);
 
 //Helps handle tFlag case, prints Logical -> Physical
-void tFlagHelper(PAGETABLE *pagetable, unsigned int logicalAddress, bool tFlag);
+void tFlagHelper(PAGETABLE *pt, unsigned int logicalAddress, bool tFlag);
 
 //Helps handle pFlag case, outputs all Page Number -> Frame Number
 void pFlagHelper(PAGETABLE *pt, string file, int addressSizeUsed, bool pFlag);
@@ -116,8 +116,8 @@ int main(int argc, char *argv[]) {
     printHelper(pagetable.sizeTotal(), hits, misses, pageSize);
 }
 
-int pageInsert(PAGETABLE *pagetable, unsigned int logicalAddr, unsigned int frame) {
-    if (pagetable->insert(logicalAddr, frame)) {
+int pageInsert(PAGETABLE *pt, unsigned int logicalAddr, unsigned int frame) {
+    if (pt->insert(logicalAddr, frame)) {
         return MISS;
     } else {
         return HIT;
@@ -128,11 +128,11 @@ int getFrame(PAGETABLE *pagetable, unsigned int logicalAddr) {
     return pagetable->getFrameNumber(logicalAddr);
 }
 
-int getPhysicalAddr(PAGETABLE *pagetable, unsigned int logicalAddr) {
-    int frameNumber = getFrame(pagetable, logicalAddr);
-    int pageSize = pagetable->entryCountArray[pagetable->levelCount];
+int getPhysicalAddr(PAGETABLE *pt, unsigned int logicalAddr) {
+    int frameNumber = getFrame(pt, logicalAddr);
+    int pageSize = pt->entryCountArray[pt->levelCount];
     int startingPhysicalLocation = frameNumber * pageSize;
-    int bitMask = pagetable->levelBitmaskArray[pagetable->levelCount];
+    int bitMask = pt->levelBitmaskArray[pt->levelCount];
     int offset = logicalAddr & bitMask;
     return startingPhysicalLocation + offset;
 }
@@ -147,9 +147,10 @@ void printHelper(int size, int hits, int missess, unsigned int pageSize) {
     cout << "Bytes used: " << size << endl;
 }
 
-void tFlagHelper(PAGETABLE *pagetable, unsigned int logicalAddress, bool tFlag) {
+void tFlagHelper(PAGETABLE *pt, unsigned int logicalAddress, bool tFlag) {
     if (tFlag) {
-        int physicalAddress = getPhysicalAddr(pagetable, logicalAddress);
+        int physicalAddress = getPhysicalAddr(pt, logicalAddress);
+        //Pad 8 bits for Hex and use Capital A-F
         printf("%08X -> %08X\n", logicalAddress, physicalAddress);
     }
 }

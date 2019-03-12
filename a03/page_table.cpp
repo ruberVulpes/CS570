@@ -18,8 +18,10 @@ PAGETABLE::PAGETABLE(unsigned int levelCount, int *bitsPerLevel) {
     int bitsForLevel;
     unsigned int cumulativeBitCount = offset;
     unsigned int bitMask;
+    //[Level Count] matches with the offset bits
     levelBitmaskArray[levelCount] = (unsigned int) ((1 << offset) - 1);
     levelShiftArray[levelCount] = 0;
+    //Page Size
     entryCountArray[levelCount] = (unsigned int) (1 << offset);
     for (int i = PAGETABLE::levelCount - 1; i >= 0; i--) {
         bitsForLevel = bitsPerLevel[i];
