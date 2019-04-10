@@ -27,11 +27,9 @@ int main(int argc, char *argv[]) {
     sem_init(&belt_limit, 0, 10);
     sem_init(&belt_candies, 0, 0);
     sem_init(&belt_mutex, 0, 1);
-    sem_init(&produce_limit, 0, 20);
-    sem_init(&consume_limit, 0, 20);
-    int *value;
-    sem_getvalue(&frog_limit, value);
-    cout << *value << endl;
+    sem_init(&produce_limit, 0, 10);
+    sem_init(&consume_limit, 0, 10);
+
     char *end;
     while ((option = getopt(argc, argv, "E:L:f:e:")) != -1) {
         switch (option) {
@@ -79,16 +77,19 @@ int main(int argc, char *argv[]) {
     sem_destroy(&belt_limit);
     sem_destroy(&belt_candies);
     sem_destroy(&belt_mutex);
+    sem_destroy(&produce_limit);
+    sem_destroy(&consume_limit);
 
 }
 
 void *producer(void *data) {
     args *arguments = (args *) data;
-    if (sem_trywait(arguments->produce_limit) == -1) {
-        pthread_exit(nullptr);
-    }
-    for (int i = 0; i < 10; i++) {
-        if ((const char *) arguments->name == "Crunchy Frog Bite") {
+
+    while(true) {
+        if (sem_trywait(arguments->produce_limit) == -1) {
+            pthread_exit(nullptr);
+        }
+        if (*arguments->name == "Crunchy Frog Bite") {
             sem_wait(arguments->frog_limit);
         }
         sem_wait(arguments->belt_limit);
@@ -113,7 +114,7 @@ void *consumer(void *data) {
         if (arguments->belt[*arguments->head] == "Crunchy Frog Bite") {
             sem_post(arguments->frog_limit);
         }
-        cout << arguments->belt[*arguments->head] << " Removed" << endl;
+        cout << arguments->belt[*arguments->head] << " Removed by " << *arguments->name << endl;
         arguments->belt[*arguments->head] = "";
         *arguments->head = (*arguments->head + 1) % 10;
         sem_post(arguments->belt_mutex);
