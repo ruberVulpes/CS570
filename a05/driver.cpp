@@ -25,12 +25,12 @@ struct args {
 
 int main(int argc, char *argv[]) {
 
-    sem_init(&frog_limit, 0, 3);
-    sem_init(&belt_limit, 0, 10);
+    sem_init(&frog_limit, 0, FROG_LIMIT);
+    sem_init(&belt_limit, 0, BELT_LIMIT);
     sem_init(&belt_candies, 0, 0);
     sem_init(&belt_mutex, 0, 1);
-    sem_init(&produce_limit, 0, 100);
-    sem_init(&consume_limit, 0, 100);
+    sem_init(&produce_limit, 0, CANDIE_LIMIT);
+    sem_init(&consume_limit, 0, CANDIE_LIMIT);
 
     char *end;
     while ((option = getopt(argc, argv, "E:L:f:e:")) != -1) {
@@ -85,16 +85,21 @@ int main(int argc, char *argv[]) {
     cout << endl << "Crunchy Frog Bite Producer Generated " << thread_args[2].produced << " Candies" << endl;
     cout << "Everlasting Escargot Sucker Producer Generated " << thread_args[3].produced << " Candies" << endl;
     cout << "Lucy Consumed " << thread_args[1].consumed[0] << " Crunchy Frog Bites + ";
-    cout << thread_args[1].consumed[1] << " Everlasting Escargot Suckers = " << thread_args[1].consumed[0] + thread_args[1].consumed[1]
+    cout << thread_args[1].consumed[1] << " Everlasting Escargot Suckers = "
+         << thread_args[1].consumed[0] + thread_args[1].consumed[1]
          << endl;
     cout << "Ethel Consumed " << thread_args[0].consumed[0] << " Crunchy Frog Bites + ";
-    cout << thread_args[0].consumed[1] << " Everlasting Escargot Suckers = " << thread_args[0].consumed[0] + thread_args[0].consumed[1]
+    cout << thread_args[0].consumed[1] << " Everlasting Escargot Suckers = "
+         << thread_args[0].consumed[0] + thread_args[0].consumed[1]
          << endl;
 }
 
 void *producer(void *data) {
     args *arguments = (args *) data;
     arguments->produced = 0;
+    int beltSize = 0;
+    int *frog_count;
+    int *produced_count;
 
     while (true) {
         if (sem_trywait(arguments->produce_limit) == -1) {
@@ -106,8 +111,17 @@ void *producer(void *data) {
         sem_wait(arguments->belt_limit);
         sem_wait(arguments->belt_mutex);
         arguments->belt[*arguments->tail] = *arguments->name;
-        cout << arguments->belt[*arguments->tail] << " added" << endl;
-        *arguments->tail = (*arguments->tail + 1) % 10;
+        beltSize = *arguments->head > *arguments->tail ?
+                   (BELT_LIMIT - *arguments->head + *arguments->tail + 1) :
+                   (*arguments->tail + *arguments->head + 1);
+        sem_getvalue(arguments->frog_limit, frog_count);
+        sem_getvalue(arguments->produce_limit, produced_count);
+        cout << "Belt: " << FROG_LIMIT - *frog_count << " frogs + ";
+        cout << beltSize - (FROG_LIMIT - *frog_count) << "escargots = ";
+        cout << beltSize << ". produced: " << CANDIE_LIMIT - *produced_count;
+        cout << endl;
+//        cout << arguments->belt[*arguments->tail] << " added" << endl;
+        *arguments->tail = (*arguments->tail + 1) % BELT_LIMIT;
         arguments->produced++;
         sem_post(arguments->belt_mutex);
         sem_post(arguments->belt_candies);
@@ -133,7 +147,7 @@ void *consumer(void *data) {
         }
         cout << arguments->belt[*arguments->head] << " Removed by " << *arguments->name << endl;
         arguments->belt[*arguments->head] = "";
-        *arguments->head = (*arguments->head + 1) % 10;
+        *arguments->head = (*arguments->head + 1) % BELT_LIMIT;
         sem_post(arguments->belt_mutex);
         sem_post(arguments->belt_limit);
         usleep(arguments->wait_time * 100);

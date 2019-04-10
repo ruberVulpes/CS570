@@ -11,6 +11,10 @@
 #include <string>
 #include <iostream>
 
+#define FROG_LIMIT 3
+#define BELT_LIMIT 10
+#define CANDIE_LIMIT 100
+
 using namespace std;
 
 int option = 0;
