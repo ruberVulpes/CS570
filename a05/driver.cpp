@@ -98,8 +98,8 @@ void *producer(void *data) {
     args *arguments = (args *) data;
     arguments->produced = 0;
     int beltSize = 0;
-    int *frog_count;
-    int *produced_count;
+    int frog_count = 0;
+    int produced_count = 0;
 
     while (true) {
         if (sem_trywait(arguments->produce_limit) == -1) {
@@ -113,13 +113,13 @@ void *producer(void *data) {
         arguments->belt[*arguments->tail] = *arguments->name;
         beltSize = *arguments->head > *arguments->tail ?
                    (BELT_LIMIT - *arguments->head + *arguments->tail + 1) :
-                   (*arguments->tail + *arguments->head + 1);
-        sem_getvalue(arguments->frog_limit, frog_count);
-        sem_getvalue(arguments->produce_limit, produced_count);
-        cout << "Belt: " << FROG_LIMIT - *frog_count << " frogs + ";
-        cout << beltSize - (FROG_LIMIT - *frog_count) << "escargots = ";
-        cout << beltSize << ". produced: " << CANDIE_LIMIT - *produced_count;
-        cout << endl;
+                   (*arguments->tail - *arguments->head + 1);
+        sem_getvalue(arguments->frog_limit, &frog_count);
+        sem_getvalue(arguments->produce_limit, &produced_count);
+        cout << "Belt: " << FROG_LIMIT - frog_count << " frogs + ";
+        cout << beltSize - (FROG_LIMIT - frog_count) << " escargots = ";
+        cout << beltSize << ". produced: " << CANDIE_LIMIT - produced_count;
+        cout << "\t Added " << *arguments->name << "." << endl;
 //        cout << arguments->belt[*arguments->tail] << " added" << endl;
         *arguments->tail = (*arguments->tail + 1) % BELT_LIMIT;
         arguments->produced++;
