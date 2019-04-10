@@ -6,22 +6,6 @@
 #include <errno.h>
 
 using namespace std;
-struct args {
-    sem_t *belt_mutex;
-    sem_t *frog_limit;
-    sem_t *belt_limit;
-    sem_t *belt_candies;
-    sem_t *produce_limit;
-    sem_t *consume_limit;
-
-    string *belt;
-    int *head;
-    int *tail;
-    int wait_time;
-    int produced;
-    string *name;
-    int consumed[2];
-};
 
 int main(int argc, char *argv[]) {
 
@@ -51,6 +35,7 @@ int main(int argc, char *argv[]) {
                 break;
         }
     }
+
     for (int i = 0; i < 4; ++i) {
         thread_args[i].frog_limit = &frog_limit;
         thread_args[i].belt_limit = &belt_limit;
@@ -94,15 +79,13 @@ int main(int argc, char *argv[]) {
 }
 
 void print_helper() {
-    int frog_count = thread_args[2].produced;
+    int frog_count = thread_args[2].produced - thread_args[0].consumed[0] - thread_args[1].consumed[0];
+    int snail_count = thread_args[3].produced - thread_args[0].consumed[1] - thread_args[1].consumed[1];
     int produced_count = thread_args[2].produced + thread_args[3].produced;
-    int beltSize = 0;
-    beltSize = head > tail ?
-               (BELT_LIMIT - head + tail + 1) :
-               (tail - head + 1);
-    cout << "Belt: " << FROG_LIMIT - frog_count << " frogs + ";
-    cout << beltSize - (FROG_LIMIT - frog_count) << " escargots = ";
-    cout << beltSize << ". produced: " << CANDIE_LIMIT - produced_count;
+
+    cout << "Belt: " << frog_count << " frogs + ";
+    cout << snail_count << " escargots = ";
+    cout << frog_count + snail_count << " produced: " << produced_count;
 }
 
 void *producer(void *data) {
@@ -118,13 +101,13 @@ void *producer(void *data) {
         sem_wait(arguments->belt_limit);
         sem_wait(arguments->belt_mutex);
         arguments->belt[*arguments->tail] = *arguments->name;
-        print_helper();
-        cout << "\t Added " << *arguments->name << "." << endl;
-        *arguments->tail = (*arguments->tail + 1) % BELT_LIMIT;
         arguments->produced++;
+        *arguments->tail = (*arguments->tail + 1) % BELT_LIMIT;
+        print_helper();
+        cout << "\tAdded " << *arguments->name << "." << endl;
         sem_post(arguments->belt_mutex);
         sem_post(arguments->belt_candies);
-        usleep(arguments->wait_time * 100);
+        usleep(arguments->wait_time * 1000);
     }
 }
 
@@ -144,13 +127,13 @@ void *consumer(void *data) {
         } else {
             arguments->consumed[1]++;
         }
-        print_helper();
-        cout << "\t" << arguments->name << " consumed " << arguments->belt[*arguments->head] << "." << endl;
+	print_helper();
+        cout << "\t" << *arguments->name << " consumed " << arguments->belt[*arguments->head] << "." << endl;
         arguments->belt[*arguments->head] = "";
         *arguments->head = (*arguments->head + 1) % BELT_LIMIT;
-        sem_post(arguments->belt_mutex);
+	sem_post(arguments->belt_mutex);
         sem_post(arguments->belt_limit);
-        usleep(arguments->wait_time * 100);
+        usleep(arguments->wait_time * 1000);
     }
 }
 
