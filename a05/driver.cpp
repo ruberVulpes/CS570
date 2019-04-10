@@ -29,8 +29,8 @@ int main(int argc, char *argv[]) {
     sem_init(&belt_limit, 0, 10);
     sem_init(&belt_candies, 0, 0);
     sem_init(&belt_mutex, 0, 1);
-    sem_init(&produce_limit, 0, 10);
-    sem_init(&consume_limit, 0, 10);
+    sem_init(&produce_limit, 0, 100);
+    sem_init(&consume_limit, 0, 100);
 
     char *end;
     while ((option = getopt(argc, argv, "E:L:f:e:")) != -1) {
@@ -82,13 +82,13 @@ int main(int argc, char *argv[]) {
     sem_destroy(&produce_limit);
     sem_destroy(&consume_limit);
 
-    cout << "Crunchy Frog Bite Producer Generated " << thread_args[2].produced << " Candies" << endl;
+    cout << endl << "Crunchy Frog Bite Producer Generated " << thread_args[2].produced << " Candies" << endl;
     cout << "Everlasting Escargot Sucker Producer Generated " << thread_args[3].produced << " Candies" << endl;
     cout << "Lucy Consumed " << thread_args[1].consumed[0] << " Crunchy Frog Bites + ";
     cout << thread_args[1].consumed[1] << " Everlasting Escargot Suckers = " << thread_args[1].consumed[0] + thread_args[1].consumed[1]
          << endl;
-    cout << "Lucy Consumed " << thread_args[0].consumed[0] << " Crunchy Frog Bites + ";
-    cout << thread_args[0].consumed[0] << " Everlasting Escargot Suckers = " << thread_args[0].consumed[0] + thread_args[0].consumed[0]
+    cout << "Ethel Consumed " << thread_args[0].consumed[0] << " Crunchy Frog Bites + ";
+    cout << thread_args[0].consumed[1] << " Everlasting Escargot Suckers = " << thread_args[0].consumed[0] + thread_args[0].consumed[1]
          << endl;
 }
 
@@ -111,7 +111,7 @@ void *producer(void *data) {
         arguments->produced++;
         sem_post(arguments->belt_mutex);
         sem_post(arguments->belt_candies);
-        //wait
+        usleep(arguments->wait_time * 100);
     }
 }
 
@@ -136,6 +136,7 @@ void *consumer(void *data) {
         *arguments->head = (*arguments->head + 1) % 10;
         sem_post(arguments->belt_mutex);
         sem_post(arguments->belt_limit);
+        usleep(arguments->wait_time * 100);
     }
 }
 
