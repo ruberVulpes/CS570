@@ -70,8 +70,9 @@ int main(int argc, char *argv[]) {
     for (int i = 2; i < 4; ++i) {
         pthread_create(&threads[i], nullptr, &producer, (void *) &thread_args[i]);
     }
+    int thread_returns[4][2];
     for (int i = 0; i < 4; ++i) {
-        pthread_join(threads[i], 0);
+        pthread_join(threads[i], (void **) &thread_returns[i]);
     }
     sem_destroy(&frog_limit);
     sem_destroy(&belt_limit);
@@ -80,14 +81,23 @@ int main(int argc, char *argv[]) {
     sem_destroy(&produce_limit);
     sem_destroy(&consume_limit);
 
+    cout << "Crunchy Frog Bite Producer Generated " << thread_returns[2] << " Candies" << endl;
+    cout << "Everlasting Escargot Sucker Producer Generated " << thread_returns[3] << " Candies" << endl;
+    cout << "Lucy Consumed " << thread_returns[1][0] << " Crunchy Frog Bites + ";
+    cout << thread_returns[1][1] << " Everlasting Escargot Suckers = " << thread_returns[1][0] + thread_returns[1][1]
+         << endl;
+    cout << "Lucy Consumed " << thread_returns[0][0] << " Crunchy Frog Bites + ";
+    cout << thread_returns[0][1] << " Everlasting Escargot Suckers = " << thread_returns[0][0] + thread_returns[0][1]
+         << endl;
 }
 
 void *producer(void *data) {
     args *arguments = (args *) data;
+    int *produced = 0;
 
-    while(true) {
+    while (true) {
         if (sem_trywait(arguments->produce_limit) == -1) {
-            pthread_exit(nullptr);
+            pthread_exit(produced);
         }
         if (*arguments->name == "Crunchy Frog Bite") {
             sem_wait(arguments->frog_limit);
@@ -97,6 +107,7 @@ void *producer(void *data) {
         arguments->belt[*arguments->tail] = *arguments->name;
         cout << arguments->belt[*arguments->tail] << " added" << endl;
         *arguments->tail = (*arguments->tail + 1) % 10;
+        *produced++;
         sem_post(arguments->belt_mutex);
         sem_post(arguments->belt_candies);
         //wait
@@ -105,14 +116,18 @@ void *producer(void *data) {
 
 void *consumer(void *data) {
     args *arguments = (args *) data;
+    int consumed[2] = {0, 0};
     while (true) {
         if (sem_trywait(arguments->consume_limit) == -1) {
-            pthread_exit(nullptr);
+            pthread_exit(consumed);
         }
         sem_wait(arguments->belt_candies);
         sem_wait(arguments->belt_mutex);
         if (arguments->belt[*arguments->head] == "Crunchy Frog Bite") {
             sem_post(arguments->frog_limit);
+            ++consumed[0];
+        } else {
+            ++consumed[1];
         }
         cout << arguments->belt[*arguments->head] << " Removed by " << *arguments->name << endl;
         arguments->belt[*arguments->head] = "";
