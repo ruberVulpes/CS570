@@ -56,8 +56,8 @@ int main(int argc, char *argv[]) {
     for (int i = 2; i < 4; ++i) {
         pthread_create(&threads[i], nullptr, &producer, (void *) &thread_args[i]);
     }
-    for (int i = 0; i < 4; ++i) {
-        pthread_join(threads[i], nullptr);
+    for (auto & thread : threads) {
+        pthread_join(thread, nullptr);
     }
     sem_destroy(&frog_limit);
     sem_destroy(&belt_limit);
@@ -127,11 +127,11 @@ void *consumer(void *data) {
         } else {
             arguments->consumed[1]++;
         }
-	print_helper();
+        print_helper();
         cout << "\t" << *arguments->name << " consumed " << arguments->belt[*arguments->head] << "." << endl;
         arguments->belt[*arguments->head] = "";
         *arguments->head = (*arguments->head + 1) % BELT_LIMIT;
-	sem_post(arguments->belt_mutex);
+        sem_post(arguments->belt_mutex);
         sem_post(arguments->belt_limit);
         usleep(arguments->wait_time * 1000);
     }

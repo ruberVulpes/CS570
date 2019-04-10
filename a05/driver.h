@@ -55,6 +55,7 @@ args thread_args[4];
 void print_helper();
 
 void *producer(void *data);
+
 void *consumer(void *data);
 
 #endif //CS570_DRIVER_H
