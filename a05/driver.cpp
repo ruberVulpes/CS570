@@ -7,21 +7,26 @@
 
 using namespace std;
 struct args {
-    sem_t *limit;
-    sem_t *mutex;
-    int n;
-    int *m;
+    sem_t *belt_mutex;
+    sem_t *frog_limit;
+    sem_t *belt_limit;
+    sem_t *belt_candies;
+
+    string *belt;
+    int *head;
+    int *tail;
+    int wait_time;
+    string *name;
 };
 
 int main(int argc, char *argv[]) {
 
-//   sem_t conveyor_belt_mutex;
-//    sem_t crunchy_frog_bite_limit;
-//    sem_t conveyor_belt_size;
-    sem_init(&crunchy_frog_bite_limit, 0, 3);
-    sem_init(&conveyor_belt_mutex, 0, 1);
+    sem_init(&frog_limit, 0, 3);
+    sem_init(&belt_limit, 0, 10);
+    sem_init(&belt_candies, 0, 0);
+    sem_init(&belt_mutex, 0, 1);
     int *value;
-    sem_getvalue(&crunchy_frog_bite_limit, value);
+    sem_getvalue(&frog_limit, value);
     cout << *value << endl;
     char *end;
     while ((option = getopt(argc, argv, "E:L:f:e:")) != -1) {
@@ -42,32 +47,63 @@ int main(int argc, char *argv[]) {
                 break;
         }
     }
-//   args pack;
-//   pack.limit = &crunchy_frog_bite_limit;
-   args data[4];
-   for(int i = 0; i < 4; ++i){
-       data[i].limit = &crunchy_frog_bite_limit;
-       data[i].mutex = &conveyor_belt_mutex;
-       data[i].n = i + 1;
-       data[i].m = value;
-       pthread_create(&threads[i],  NULL, &worker, (void*)&data[i]);
-   }
-   for(int i =0; i < 4; ++i){
-      pthread_join(threads[i], 0);
-   }
-   sem_destroy(&crunchy_frog_bite_limit);
-   sem_destroy(&conveyor_belt_mutex);
+    args thread_args[4];
+    for (int i = 0; i < 4; ++i) {
+        thread_args[i].frog_limit = &frog_limit;
+        thread_args[i].belt_limit = &belt_limit;
+        thread_args[i].belt_mutex = &belt_mutex;
+        thread_args[i].belt_candies = &belt_candies;
+        thread_args[i].belt = conveyor_belt;
+        thread_args[i].head = &head;
+        thread_args[i].tail = &tail;
+        thread_args[i].wait_time = flagValues[i];
+        thread_args[i].name = &thread_names[i];
+    }
+    for (int i = 0; i < 2; ++i) {
+        pthread_create(&threads[i], nullptr, &consumer, (void *) &thread_args[i]);
+    }
+    for (int i = 2; i < 4; ++i) {
+        pthread_create(&threads[i], nullptr, &producer, (void *) &thread_args[i]);
+    }
+    for (int i = 0; i < 4; ++i) {
+        pthread_join(threads[i], 0);
+    }
+    sem_destroy(&frog_limit);
+    sem_destroy(&belt_limit);
+    sem_destroy(&belt_candies);
+    sem_destroy(&belt_mutex);
 
 }
 
-void *worker(void *arguments){
-	args *pack = (args *) arguments;
-//        cout << "Thread: " << pack->n << " waiting" << endl;
-        sem_wait(pack->mutex);
-	//sem_wait(pack->limit);
-	cout << "Thread: " << pack->n << " in: " << *pack->m << endl;
-        *(pack->m) *= pack->n;
-	//sem_post(pack->limit);
-	sem_post(pack->mutex);        
-//	cout << "Thread: " << pack->n << " released" << endl;
+void *producer(void *data) {
+    args *arguments = (args *) data;
+    for (int i = 0; i < 10; i++) {
+        if ((const char *) arguments->name == "Crunchy Frog Bite") {
+            sem_wait(arguments->frog_limit);
+        }
+        sem_wait(arguments->belt_limit);
+        sem_wait(arguments->belt_mutex);
+        arguments->belt[*arguments->tail] = *arguments->name;
+        cout << arguments->belt[*arguments->tail] << " added" << endl;
+        *arguments->tail = (*arguments->tail + 1) % 10;
+        sem_post(arguments->belt_mutex);
+        sem_post(arguments->belt_candies);
+        //wait
+    }
 }
+
+void *consumer(void *data) {
+    args *arguments = (args *) data;
+    sem_wait(arguments->belt_candies);
+    sem_wait(arguments->belt_mutex);
+    if (arguments->belt[*arguments->head] == "Crunchy Frog Bite") {
+        sem_post(arguments->frog_limit);
+    }
+    cout << arguments->belt[*arguments->head] << " Removed" << endl;
+    arguments->belt[*arguments->head] = "";
+    *arguments->head = (*arguments->head + 1) % 10;
+    sem_post(arguments->belt_mutex);
+    sem_post(arguments->belt_limit);
+}
+
+

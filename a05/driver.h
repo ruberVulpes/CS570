@@ -15,9 +15,10 @@ using namespace std;
 int option = 0;
 int flagValues[4] = {0, 0, 0, 0};
 
-sem_t conveyor_belt_mutex;
-sem_t crunchy_frog_bite_limit;
-sem_t conveyor_belt_size;
+sem_t belt_mutex;
+sem_t frog_limit;
+sem_t belt_limit;
+sem_t belt_candies;
 string conveyor_belt[10];
 int head = 0;
 int tail = 0;
@@ -25,8 +26,7 @@ int tail = 0;
 string thread_names[4] = {"Ethel", "Lucy", "Crunchy Frog Bite", "Everlasting Escargot Sucker"};
 pthread_t threads[4];
 
-void *worker(void *args);
+void *producer(void *data);
+void *consumer(void *data);
 
-void *producer(void *);
-void producer_helper(sem_t * mutex_ptr, sem_t *frog_bite_limit_ptr, sem_t *conveyor_belt_size_ptr, string conveyor_belt_ptr[10], int* tail, string candie, int time_to_produce);
 #endif //CS570_DRIVER_H
