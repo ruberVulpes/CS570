@@ -6,21 +6,23 @@
 #include <errno.h>
 
 using namespace std;
+struct pck {
+    sem_t *limit;
+    sem_t *mutex;
+    int n;
+    int *m;
+};
 
 int main(int argc, char *argv[]) {
 
-    sem_t *conveyor_belt_mutex;
-    sem_t *crunchy_frog_bite_limit;
-    sem_t *conveyor_belt_size;
-//    sem_init(&crunchy_frog_bite_limit, 0, 3);
-//    sem_init(&conveyor_belt_mutex, 0, 1);
-#define SHAREDSEM "Test"
-    sem_unlink(SHAREDSEM);
-    conveyor_belt_size = sem_open("Test", O_CREAT, 0600, 10);
-    if(conveyor_belt_size == SEM_FAILED)
-        cout << strerror(errno);
-    int * value;
-
+//   sem_t conveyor_belt_mutex;
+//    sem_t crunchy_frog_bite_limit;
+//    sem_t conveyor_belt_size;
+    sem_init(&crunchy_frog_bite_limit, 0, 3);
+    sem_init(&conveyor_belt_mutex, 0, 1);
+    int *value;
+    sem_getvalue(&crunchy_frog_bite_limit, value);
+    cout << *value << endl;
     char *end;
     while ((option = getopt(argc, argv, "E:L:f:e:")) != -1) {
         switch (option) {
@@ -40,34 +42,32 @@ int main(int argc, char *argv[]) {
                 break;
         }
     }
-    thread_args frog;
-    frog.name = &thread_names[2];
-    int th_rt[5];
-    for (int i = 0; i < 4; ++i) {
-        th_rt[i] = pthread_create(&threads[i], NULL, producer, (void *) &frog);
-    }
-    for (int i = 0; i < 4; ++i) {
-        pthread_join(threads[i], NULL);
-    }
-//    producer(&conveyor_belt_mutex, &crunchy_frog_bite_limit, &conveyor_belt_size, conveyor_belt, &tail, thread_names[2], 0);
-//    producer(&conveyor_belt_mutex, &crunchy_frog_bite_limit, &conveyor_belt_size, conveyor_belt, &tail, thread_names[2], 0);
-    sem_unlink(SHAREDSEM);
+//   pck pack;
+//   pack.limit = &crunchy_frog_bite_limit;
+   pck packs[4];
+   for(int i = 0; i < 4; ++i){
+       packs[i].limit = &crunchy_frog_bite_limit;
+       packs[i].mutex = &conveyor_belt_mutex;
+       packs[i].n = i + 1;
+       packs[i].m = value;
+       pthread_create(&threads[i],  NULL, &worker, (void*)&packs[i]);
+   }
+   for(int i =0; i < 4; ++i){
+      pthread_join(threads[i], 0);
+   }
+   sem_destroy(&crunchy_frog_bite_limit);
+   sem_destroy(&conveyor_belt_mutex);
+
 }
 
-void *producer(void *arguments) {
-    thread_args *args = (thread_args *) arguments;
-    producer_helper(args->cbm, args->cfbt, args->cbs, args->cb, args->start, *args->name, args->time_to_wait);
-}
-
-void producer_helper(sem_t *mutex_ptr, sem_t *frog_bite_limit_ptr, sem_t *conveyor_belt_size_ptr,
-                     string conveyor_belt_ptr[10], int *tail, string candie, int time_to_produce) {
-    if (candie == "Everlasting Escargot Sucker") {
-        sem_wait(frog_bite_limit_ptr);
-    }
-    sem_wait(conveyor_belt_size_ptr);
-    sem_wait(mutex_ptr);
-    conveyor_belt_ptr[(*tail)++] = candie;
-    *tail %= 10;
-    sem_post(mutex_ptr);
-
+void *worker(void *args){
+	pck *pack = (pck *) args;
+//        cout << "Thread: " << pack->n << " waiting" << endl;
+        sem_wait(pack->mutex);
+	//sem_wait(pack->limit);
+	cout << "Thread: " << pack->n << " in: " << *pack->m << endl;
+        *(pack->m) *= pack->n;
+	//sem_post(pack->limit);
+	sem_post(pack->mutex);        
+//	cout << "Thread: " << pack->n << " released" << endl;
 }
