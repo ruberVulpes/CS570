@@ -11,6 +11,8 @@ struct args {
     sem_t *frog_limit;
     sem_t *belt_limit;
     sem_t *belt_candies;
+    sem_t *produce_limit;
+    sem_t *consume_limit;
 
     string *belt;
     int *head;
@@ -25,6 +27,8 @@ int main(int argc, char *argv[]) {
     sem_init(&belt_limit, 0, 10);
     sem_init(&belt_candies, 0, 0);
     sem_init(&belt_mutex, 0, 1);
+    sem_init(&produce_limit, 0, 20);
+    sem_init(&consume_limit, 0, 20);
     int *value;
     sem_getvalue(&frog_limit, value);
     cout << *value << endl;
@@ -53,6 +57,9 @@ int main(int argc, char *argv[]) {
         thread_args[i].belt_limit = &belt_limit;
         thread_args[i].belt_mutex = &belt_mutex;
         thread_args[i].belt_candies = &belt_candies;
+        thread_args[i].produce_limit = &produce_limit;
+        thread_args[i].consume_limit = &consume_limit;
+
         thread_args[i].belt = conveyor_belt;
         thread_args[i].head = &head;
         thread_args[i].tail = &tail;
@@ -77,6 +84,9 @@ int main(int argc, char *argv[]) {
 
 void *producer(void *data) {
     args *arguments = (args *) data;
+    if (sem_trywait(arguments->produce_limit) == -1) {
+        pthread_exit(nullptr);
+    }
     for (int i = 0; i < 10; i++) {
         if ((const char *) arguments->name == "Crunchy Frog Bite") {
             sem_wait(arguments->frog_limit);
@@ -94,16 +104,21 @@ void *producer(void *data) {
 
 void *consumer(void *data) {
     args *arguments = (args *) data;
-    sem_wait(arguments->belt_candies);
-    sem_wait(arguments->belt_mutex);
-    if (arguments->belt[*arguments->head] == "Crunchy Frog Bite") {
-        sem_post(arguments->frog_limit);
+    while (true) {
+        if (sem_trywait(arguments->consume_limit) == -1) {
+            pthread_exit(nullptr);
+        }
+        sem_wait(arguments->belt_candies);
+        sem_wait(arguments->belt_mutex);
+        if (arguments->belt[*arguments->head] == "Crunchy Frog Bite") {
+            sem_post(arguments->frog_limit);
+        }
+        cout << arguments->belt[*arguments->head] << " Removed" << endl;
+        arguments->belt[*arguments->head] = "";
+        *arguments->head = (*arguments->head + 1) % 10;
+        sem_post(arguments->belt_mutex);
+        sem_post(arguments->belt_limit);
     }
-    cout << arguments->belt[*arguments->head] << " Removed" << endl;
-    arguments->belt[*arguments->head] = "";
-    *arguments->head = (*arguments->head + 1) % 10;
-    sem_post(arguments->belt_mutex);
-    sem_post(arguments->belt_limit);
 }
 
 

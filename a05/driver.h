@@ -19,6 +19,8 @@ sem_t belt_mutex;
 sem_t frog_limit;
 sem_t belt_limit;
 sem_t belt_candies;
+sem_t produce_limit;
+sem_t consume_limit;
 string conveyor_belt[10];
 int head = 0;
 int tail = 0;
