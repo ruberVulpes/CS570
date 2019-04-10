@@ -6,7 +6,7 @@
 #include <errno.h>
 
 using namespace std;
-struct pck {
+struct args {
     sem_t *limit;
     sem_t *mutex;
     int n;
@@ -42,15 +42,15 @@ int main(int argc, char *argv[]) {
                 break;
         }
     }
-//   pck pack;
+//   args pack;
 //   pack.limit = &crunchy_frog_bite_limit;
-   pck packs[4];
+   args data[4];
    for(int i = 0; i < 4; ++i){
-       packs[i].limit = &crunchy_frog_bite_limit;
-       packs[i].mutex = &conveyor_belt_mutex;
-       packs[i].n = i + 1;
-       packs[i].m = value;
-       pthread_create(&threads[i],  NULL, &worker, (void*)&packs[i]);
+       data[i].limit = &crunchy_frog_bite_limit;
+       data[i].mutex = &conveyor_belt_mutex;
+       data[i].n = i + 1;
+       data[i].m = value;
+       pthread_create(&threads[i],  NULL, &worker, (void*)&data[i]);
    }
    for(int i =0; i < 4; ++i){
       pthread_join(threads[i], 0);
@@ -60,8 +60,8 @@ int main(int argc, char *argv[]) {
 
 }
 
-void *worker(void *args){
-	pck *pack = (pck *) args;
+void *worker(void *arguments){
+	args *pack = (args *) arguments;
 //        cout << "Thread: " << pack->n << " waiting" << endl;
         sem_wait(pack->mutex);
 	//sem_wait(pack->limit);
