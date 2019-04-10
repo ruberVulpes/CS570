@@ -32,6 +32,10 @@ int tail = 0;
 
 string thread_names[4] = {"Ethel", "Lucy", "Crunchy Frog Bite", "Everlasting Escargot Sucker"};
 pthread_t threads[4];
+args thread_args[4];
+
+
+void print_helper();
 
 void *producer(void *data);
 void *consumer(void *data);
