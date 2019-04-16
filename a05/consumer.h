@@ -6,7 +6,7 @@
 #define CS570_CONSUMER_H
 
 #include "driver.h"
-
+#include "args.h"
 void *consumer(void *data);
 
 void consumer_print_helper(args *arguments);

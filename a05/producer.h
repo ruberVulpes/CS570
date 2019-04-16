@@ -6,6 +6,7 @@
 #define CS570_PRODUCER_H
 
 #include "driver.h"
+#include "args.h"
 
 void *producer(void *data);
 
