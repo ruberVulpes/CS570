@@ -17,9 +17,10 @@
 
 #define LUCY thread_args[1]
 #define ETHEL thread_args[0]
-#define FROG thread_args[2]
-#define SNAIL thread_args[3]
-
+#define FROG_BITE thread_args[2]
+#define FROG 0
+#define SNAIL_SUCKER thread_args[3]
+#define SNAIL 1
 using namespace std;
 
 struct args {
