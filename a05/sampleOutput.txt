@@ -1,0 +1,23 @@
+....
+
+Belt: 1 frogs + 0 escargots = 1 produced: 94	Added Crunchy Frog Bite.
+Belt: 0 frogs + 0 escargots = 0 produced: 94	Ethel consumed Crunchy Frog Bite.
+Belt: 0 frogs + 1 escargots = 1 produced: 95	Added Everlasting Escargot Sucker.
+Belt: 0 frogs + 0 escargots = 0 produced: 95	Lucy consumed Everlasting Escargot Sucker.
+Belt: 0 frogs + 1 escargots = 1 produced: 96	Added Everlasting Escargot Sucker.
+Belt: 0 frogs + 0 escargots = 0 produced: 96	Lucy consumed Everlasting Escargot Sucker.
+Belt: 1 frogs + 0 escargots = 1 produced: 97	Added Crunchy Frog Bite.
+Belt: 0 frogs + 0 escargots = 0 produced: 97	Ethel consumed Crunchy Frog Bite.
+Belt: 0 frogs + 1 escargots = 1 produced: 98	Added Everlasting Escargot Sucker.
+Belt: 0 frogs + 0 escargots = 0 produced: 98	Lucy consumed Everlasting Escargot Sucker.
+Belt: 1 frogs + 0 escargots = 1 produced: 99	Added Crunchy Frog Bite.
+Belt: 0 frogs + 0 escargots = 0 produced: 99	Ethel consumed Crunchy Frog Bite.
+Belt: 0 frogs + 1 escargots = 1 produced: 100	Added Everlasting Escargot Sucker.
+Belt: 0 frogs + 0 escargots = 0 produced: 100	Lucy consumed Everlasting Escargot Sucker.
+
+PRODUCTION REPORT
+----------------------------------------
+Crunchy Frog Bite Producer Generated 40 Candies
+Everlasting Escargot Sucker Producer Generated 60 Candies
+Lucy Consumed 2 Crunchy Frog Bites + 58 Everlasting Escargot Suckers = 60
+Ethel Consumed 38 Crunchy Frog Bites + 2 Everlasting Escargot Suckers = 40
