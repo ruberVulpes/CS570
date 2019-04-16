@@ -1,7 +1,12 @@
 CC = g++ -std=c++11
 
-mizzo: driver.cpp driver.h
-	${CC} -g -o mizzo driver.cpp -lpthread -lrt
+mizzo: driver.cpp driver.h producer.o consumer.o
+	${CC} -g -o mizzo driver.cpp producer.o consumer.o -lpthread -lrt
+
+producer: producer.cpp producer.h
+	${CC} -c producer.cpp
+consumer: consumer.cpp consumer.h
+	${CC} -c consumer.cpp
 
 clean:
-	rm mizzo
+	rm  *.o mizzo

@@ -71,10 +71,14 @@ int main(int argc, char *argv[]) {
     sem_destroy(&belt_mutex);
     sem_destroy(&produce_limit);
     sem_destroy(&consume_limit);
+    driver_print_helper()
 
-    // Print Production Report
+}
+
+// Print Production Report
+void driver_print_helper() {
     cout << endl << "PRODUCTION REPORT" << endl;
-    cout << "----------------------------------------" << endl;
+    cout << "----------------------------------------";
     cout << endl << "Crunchy Frog Bite Producer Generated ";
     cout << FROG_BITE.produced << " Candies" << endl;
     cout << "Everlasting Escargot Sucker Producer Generated ";
@@ -88,76 +92,3 @@ int main(int argc, char *argv[]) {
     cout << " Everlasting Escargot Suckers = ";
     cout << ETHEL.consumed[FROG] + ETHEL.consumed[SNAIL] << endl;
 }
-
-//Used for every consumption/production of candy
-void print_helper() {
-    int frog_count = FROG_BITE.produced;
-    frog_count -= (ETHEL.consumed[FROG] + LUCY.consumed[FROG]);
-    int snail_count = SNAIL_SUCKER.produced;
-    snail_count -= (ETHEL.consumed[SNAIL] + LUCY.consumed[SNAIL]);
-    int produced_count = FROG_BITE.produced + SNAIL_SUCKER.produced;
-    cout << "Belt: " << frog_count << " frogs + ";
-    cout << snail_count << " escargots = ";
-    cout << frog_count + snail_count << " produced: " << produced_count;
-}
-
-void *producer(void *data) {
-    args *arguments = (args *) data;
-    arguments->produced = 0;
-    while (true) {
-        //Exit if produce limit has been hit
-        if (sem_trywait(arguments->produce_limit) == -1) {
-            pthread_exit(nullptr);
-        }
-        if (*arguments->name == "Crunchy Frog Bite") {
-            sem_wait(arguments->frog_limit);
-        }
-        sem_wait(arguments->belt_limit);
-        sem_wait(arguments->belt_mutex);
-        arguments->belt[*arguments->tail] = *arguments->name;
-        arguments->produced++;
-        //Increase tail counter of circular array
-        *arguments->tail = (*arguments->tail + 1) % BELT_LIMIT;
-        print_helper();
-        cout << "\tAdded " << *arguments->name << "." << endl;
-        sem_post(arguments->belt_mutex);
-        sem_post(arguments->belt_candies);
-        //Sleep if wait time specified, default is 0
-        //Convert ms to micro seconds
-        usleep(arguments->wait_time * 1000);
-    }
-}
-
-void *consumer(void *data) {
-    args *arguments = (args *) data;
-    arguments->consumed[FROG] = 0;
-    arguments->consumed[SNAIL] = 0;
-    while (true) {
-        //Exit if consume limit has been hit
-        if (sem_trywait(arguments->consume_limit) == -1) {
-            pthread_exit(nullptr);
-        }
-        sem_wait(arguments->belt_candies);
-        sem_wait(arguments->belt_mutex);
-        if (arguments->belt[*arguments->head] == "Crunchy Frog Bite") {
-            sem_post(arguments->frog_limit);
-            arguments->consumed[FROG]++;
-        } else {
-            arguments->consumed[SNAIL]++;
-        }
-        print_helper();
-        cout << "\t" << *arguments->name << " consumed ";
-        cout << arguments->belt[*arguments->head] << "." << endl;
-        //Clear current candy string
-        arguments->belt[*arguments->head] = "";
-        //Increase head counter of the circular array
-        *arguments->head = (*arguments->head + 1) % BELT_LIMIT;
-        sem_post(arguments->belt_mutex);
-        sem_post(arguments->belt_limit);
-        //Wait if required, wait time is default to 0
-        //Convert ms to micro seconds
-        usleep(arguments->wait_time * 1000);
-    }
-}
-
-

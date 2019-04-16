@@ -13,6 +13,9 @@
 #include <string>
 #include <iostream>
 
+#include "producer.h"
+#include "consumer.h"
+
 #define FROG_LIMIT 3
 #define BELT_LIMIT 10
 #define CANDIE_LIMIT 100
@@ -62,10 +65,7 @@ pthread_t threads[4];
 args thread_args[4];
 
 
-void print_helper();
+void driver_print_helper();
 
-void *producer(void *data);
-
-void *consumer(void *data);
 
 #endif //CS570_DRIVER_H
