@@ -21,7 +21,7 @@ void *producer(void *data) {
         arguments->produced++;
         //Increase tail counter of circular array
         *arguments->tail = (*arguments->tail + 1) % BELT_LIMIT;
-        consumer_print_helper(arguments);
+        producer_print_helper(arguments);
         sem_post(arguments->belt_mutex);
         sem_post(arguments->belt_candies);
         //Sleep if wait time specified, default is 0
