@@ -17,16 +17,6 @@
 #include "consumer.h"
 #include "args.h"
 
-#define FROG_LIMIT 3
-#define BELT_LIMIT 10
-#define CANDIE_LIMIT 100
-
-#define LUCY thread_args[1]
-#define ETHEL thread_args[0]
-#define FROG_BITE thread_args[2]
-#define FROG 0
-#define SNAIL_SUCKER thread_args[3]
-#define SNAIL 1
 using namespace std;
 
 int option = 0;
