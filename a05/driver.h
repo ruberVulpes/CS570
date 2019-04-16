@@ -15,6 +15,11 @@
 #define BELT_LIMIT 10
 #define CANDIE_LIMIT 10
 
+#define LUCY thread_args[1]
+#define ETHEL thread_args[0]
+#define FROG thread_args[2]
+#define SNAIL thread_args[3]
+
 using namespace std;
 
 struct args {
@@ -47,7 +52,8 @@ string conveyor_belt[10];
 int head = 0;
 int tail = 0;
 
-string thread_names[4] = {"Ethel", "Lucy", "Crunchy Frog Bite", "Everlasting Escargot Sucker"};
+string thread_names[4] = {"Ethel", "Lucy",
+                          "Crunchy Frog Bite", "Everlasting Escargot Sucker"};
 pthread_t threads[4];
 args thread_args[4];
 

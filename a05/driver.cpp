@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     for (int i = 2; i < 4; ++i) {
         pthread_create(&threads[i], nullptr, &producer, (void *) &thread_args[i]);
     }
-    for (auto & thread : threads) {
+    for (auto &thread : threads) {
         pthread_join(thread, nullptr);
     }
     sem_destroy(&frog_limit);
@@ -66,22 +66,24 @@ int main(int argc, char *argv[]) {
     sem_destroy(&produce_limit);
     sem_destroy(&consume_limit);
 
-    cout << endl << "Crunchy Frog Bite Producer Generated " << thread_args[2].produced << " Candies" << endl;
-    cout << "Everlasting Escargot Sucker Producer Generated " << thread_args[3].produced << " Candies" << endl;
-    cout << "Lucy Consumed " << thread_args[1].consumed[0] << " Crunchy Frog Bites + ";
-    cout << thread_args[1].consumed[1] << " Everlasting Escargot Suckers = "
-         << thread_args[1].consumed[0] + thread_args[1].consumed[1]
-         << endl;
-    cout << "Ethel Consumed " << thread_args[0].consumed[0] << " Crunchy Frog Bites + ";
-    cout << thread_args[0].consumed[1] << " Everlasting Escargot Suckers = "
-         << thread_args[0].consumed[0] + thread_args[0].consumed[1]
-         << endl;
+    cout << endl << "Crunchy Frog Bite Producer Generated ";
+    cout << FROG.produced << " Candies" << endl;
+    cout << "Everlasting Escargot Sucker Producer Generated ";
+    cout << SNAIL.produced << " Candies" << endl;
+    cout << "Lucy Consumed " << LUCY.consumed[0];
+    cout << " Crunchy Frog Bites + " << LUCY.consumed[1];
+    cout << " Everlasting Escargot Suckers = ";
+    cout << LUCY.consumed[0] + LUCY.consumed[1] << endl;
+    cout << "Ethel Consumed " << ETHEL.consumed[0];
+    cout << " Crunchy Frog Bites + " << ETHEL.consumed[1];
+    cout << " Everlasting Escargot Suckers = ";
+    cout << ETHEL.consumed[0] + ETHEL.consumed[1] << endl;
 }
 
 void print_helper() {
-    int frog_count = thread_args[2].produced - thread_args[0].consumed[0] - thread_args[1].consumed[0];
-    int snail_count = thread_args[3].produced - thread_args[0].consumed[1] - thread_args[1].consumed[1];
-    int produced_count = thread_args[2].produced + thread_args[3].produced;
+    int frog_count = FROG.produced - ETHEL.consumed[0] - LUCY.consumed[0];
+    int snail_count = SNAIL.produced - ETHEL.consumed[1] - LUCY.consumed[1];
+    int produced_count = FROG.produced + SNAIL.produced;
 
     cout << "Belt: " << frog_count << " frogs + ";
     cout << snail_count << " escargots = ";
@@ -128,7 +130,8 @@ void *consumer(void *data) {
             arguments->consumed[1]++;
         }
         print_helper();
-        cout << "\t" << *arguments->name << " consumed " << arguments->belt[*arguments->head] << "." << endl;
+        cout << "\t" << *arguments->name << " consumed ";
+        cout << arguments->belt[*arguments->head] << "." << endl;
         arguments->belt[*arguments->head] = "";
         *arguments->head = (*arguments->head + 1) % BELT_LIMIT;
         sem_post(arguments->belt_mutex);
