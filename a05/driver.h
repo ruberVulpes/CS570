@@ -13,7 +13,7 @@
 
 #define FROG_LIMIT 3
 #define BELT_LIMIT 10
-#define CANDIE_LIMIT 10
+#define CANDIE_LIMIT 100
 
 #define LUCY thread_args[1]
 #define ETHEL thread_args[0]
