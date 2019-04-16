@@ -10,7 +10,7 @@ void *producer(void *data) {
     while (true) {
         //Exit if produce limit has been hit
         if (sem_trywait(arguments->produce_limit) == -1) {
-            pthread_exit(nullptr);
+            pthread_exit(NULL);
         }
         if (*arguments->name == "Crunchy Frog Bite") {
             sem_wait(arguments->frog_limit);

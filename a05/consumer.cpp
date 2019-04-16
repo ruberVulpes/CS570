@@ -11,7 +11,7 @@ void *consumer(void *data) {
     while (true) {
         //Exit if consume limit has been hit
         if (sem_trywait(arguments->consume_limit) == -1) {
-            pthread_exit(nullptr);
+            pthread_exit(NULL);
         }
         sem_wait(arguments->belt_candies);
         sem_wait(arguments->belt_mutex);
