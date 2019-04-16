@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     sem_destroy(&belt_mutex);
     sem_destroy(&produce_limit);
     sem_destroy(&consume_limit);
-    driver_print_helper()
+    driver_print_helper();
 
 }
 

@@ -8,6 +8,7 @@
 #include "driver.h"
 
 void *consumer(void *data);
+
 void consumer_print_helper(args *arguments);
 
 #endif //CS570_CONSUMER_H
