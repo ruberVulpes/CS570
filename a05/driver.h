@@ -1,5 +1,6 @@
 //
 // Created by William Fox on 4/7/2019.
+// cssc1084
 //
 
 #ifndef CS570_DRIVER_H
@@ -8,6 +9,7 @@
 #include <unistd.h>
 #include <semaphore.h>
 #include <unistd.h>
+#include <errno.h>
 #include <string>
 #include <iostream>
 
@@ -49,6 +51,7 @@ sem_t belt_limit;
 sem_t belt_candies;
 sem_t produce_limit;
 sem_t consume_limit;
+//Treated as circular array
 string conveyor_belt[10];
 int head = 0;
 int tail = 0;

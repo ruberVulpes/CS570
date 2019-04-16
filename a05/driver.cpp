@@ -1,9 +1,9 @@
 //
 // Created by William Fox on 4/7/2019.
+// cssc1084
 //
 
 #include "driver.h"
-#include <errno.h>
 
 using namespace std;
 
@@ -86,6 +86,7 @@ int main(int argc, char *argv[]) {
     cout << " Everlasting Escargot Suckers = ";
     cout << ETHEL.consumed[FROG] + ETHEL.consumed[SNAIL] << endl;
 }
+
 //Used for every consumption/production of candy
 void print_helper() {
     int frog_count = FROG_BITE.produced;
@@ -120,6 +121,7 @@ void *producer(void *data) {
         sem_post(arguments->belt_mutex);
         sem_post(arguments->belt_candies);
         //Sleep if wait time specified, default is 0
+        //Convert ms to micro seconds
         usleep(arguments->wait_time * 1000);
     }
 }
@@ -151,6 +153,7 @@ void *consumer(void *data) {
         sem_post(arguments->belt_mutex);
         sem_post(arguments->belt_limit);
         //Wait if required, wait time is default to 0
+        //Convert ms to micro seconds
         usleep(arguments->wait_time * 1000);
     }
 }
