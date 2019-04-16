@@ -73,7 +73,8 @@ int main(int argc, char *argv[]) {
     sem_destroy(&consume_limit);
 
     // Print Production Report
-    cout << "PRODUCTION REPORT\n" << "----------------------------------------";
+    cout << endl << "PRODUCTION REPORT" << endl;
+    cout << "----------------------------------------" << endl;
     cout << endl << "Crunchy Frog Bite Producer Generated ";
     cout << FROG_BITE.produced << " Candies" << endl;
     cout << "Everlasting Escargot Sucker Producer Generated ";
